@@ -8,7 +8,7 @@ public class ListenMessages : MonoBehaviour
     private const float maxDepth = 6.0f;
 
     private UDPHelper m_udpHelper;
-    private float centerDepth;
+    private float _centerDepth;
 
     public GameObject capsuleGO;
     private MeshRenderer capsuleRenderer;
@@ -20,7 +20,12 @@ public class ListenMessages : MonoBehaviour
     private GradientColorKey[] colorKey;
     private GradientAlphaKey[] alphaKey;
     
-    // ------------state control------------
+    // ------------for sharing to other scripts------------
+    public float CenterDepth
+    {
+        get { return _centerDepth;  }
+        set { _centerDepth = value; }
+    }
     public enum AppState
     {
         NotConnected, Searching, Calibrating, NoHand, Waving
@@ -37,7 +42,7 @@ public class ListenMessages : MonoBehaviour
             State = newState;
         }
     }
-    // ------------state control------------
+    // ------------for sharing to other scripts------------
 
     private void Awake()
     {
@@ -81,11 +86,11 @@ public class ListenMessages : MonoBehaviour
 
         if (splitMsg[0] == "depth")
         {
-            if (float.TryParse(splitMsg[1], out centerDepth))
+            if (float.TryParse(splitMsg[1], out _centerDepth))
             {
-                if (!(centerDepth > 0 && centerDepth < maxDepth)) return;
+                if (!(_centerDepth > 0 && _centerDepth < maxDepth)) return;
 
-                capsuleRenderer.material.color = gradient.Evaluate(centerDepth / maxDepth);
+                capsuleRenderer.material.color = gradient.Evaluate(_centerDepth / maxDepth);
             }
             else Debug.Log("Failed to parse");
         }
