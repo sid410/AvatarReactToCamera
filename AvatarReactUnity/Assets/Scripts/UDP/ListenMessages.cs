@@ -8,7 +8,7 @@ public class ListenMessages : MonoBehaviour
     private const float maxDepth = 6.0f;
 
     private UDPHelper m_udpHelper;
-    private float _centerDepth;
+    private float _centerDepth = 0.0f;
 
     public GameObject capsuleGO;
     private MeshRenderer capsuleRenderer;
