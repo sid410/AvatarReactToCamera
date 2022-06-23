@@ -224,8 +224,8 @@ def most_frequent(input_list):
 
 # Our region of interest will be the top right part of the frame.
 region_top = 0
-region_bottom = int(2 * FRAME_HEIGHT / 3)
-region_left = int(FRAME_WIDTH / 2)
+region_bottom = int(2 * FRAME_HEIGHT / 5)
+region_left = int(3 *FRAME_WIDTH / 4)
 region_right = FRAME_WIDTH
 frames_elapsed = 0
 
@@ -270,7 +270,8 @@ while True:
 
     # Get depth data
     centerDepth = cap.depth_frame.get_distance(int(FRAME_WIDTH/2), int(FRAME_HEIGHT/2))
-
+    #print(centerDepth)
+    
     # Send depth data and state
     send_string("depth:" + str(centerDepth))
     send_status_msg()

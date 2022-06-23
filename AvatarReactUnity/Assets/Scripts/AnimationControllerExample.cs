@@ -14,7 +14,7 @@ public class AnimationControllerExample : MonoBehaviour
     //Example of how to call the public variables in ListenMessages
     private void Update()
     {
-        Debug.Log(m_ListenMessages.State == ListenMessages.AppState.NotConnected);
-        Debug.Log(m_ListenMessages.CenterDepth);
+        //Debug.Log(m_ListenMessages.State == ListenMessages.AppState.NotConnected);
+        //Debug.Log(m_ListenMessages.CenterDepth);
     }
 }
