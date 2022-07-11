@@ -175,8 +175,8 @@ def main():
 
                 # Hand sign classification
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
-                if hand_sign_id == 2:  # Point gesture
-                    point_history.append(landmark_list[8])
+                if hand_sign_id == 0:  # Point gesture
+                    point_history.append(landmark_list[9])
                 else:
                     point_history.append([0, 0])
 
@@ -186,10 +186,6 @@ def main():
                 if point_history_len == (history_length * 2):
                     finger_gesture_id = point_history_classifier(
                         pre_processed_point_history_list)
-
-                # If Clockwise gesture is recognized, send message to Unity
-                if finger_gesture_id == 1:
-                    send_string("gesture:interactionHi")
 
                 # Calculates the gesture IDs in the latest detection
                 finger_gesture_history.append(finger_gesture_id)
@@ -206,6 +202,11 @@ def main():
                     keypoint_classifier_labels[hand_sign_id],
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
+
+                # If Waving gesture is recognized, send message to Unity
+                if point_history_classifier_labels[most_common_fg_id[0][0]] == "Waving":
+                    send_string("gesture:interactionHi")
+
         else:
             point_history.append([0, 0])
 
