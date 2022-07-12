@@ -175,8 +175,14 @@ def main():
 
                 # Hand sign classification
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
-                if hand_sign_id == 0:  # Point gesture
-                    point_history.append(landmark_list[9])
+                if hand_sign_id == 0:  # open
+                    point_history.append(landmark_list[9])  # middle_finger_mcp
+                elif hand_sign_id == 1:  # close
+                    point_history.append(landmark_list[10])  # middle_finger_pip
+                elif hand_sign_id == 2:  # nico
+                    point_history.append(landmark_list[12])  # middle_finger_tip
+                elif hand_sign_id == 3:  # heart
+                    point_history.append(landmark_list[17])  # pinky_mcp
                 else:
                     point_history.append([0, 0])
 
@@ -203,9 +209,17 @@ def main():
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
 
-                # If Waving gesture is recognized, send message to Unity
-                if point_history_classifier_labels[most_common_fg_id[0][0]] == "Waving":
-                    send_string("gesture:interactionHi")
+                hand_movement = point_history_classifier_labels[most_common_fg_id[0][0]]
+
+                # If hand sign and gesture combination is recognized, send message to Unity
+                if hand_sign_id == 0 and hand_movement == "Sideways":
+                    print("hi!!~")
+                elif hand_sign_id == 1 and hand_movement == "UpDown":
+                    print("nyan nyan!")
+                elif hand_sign_id == 2 and hand_movement != "Stop":
+                    print("nico nico nii!!~~~")
+                elif hand_sign_id == 3 and hand_movement == "Sideways":
+                    print("moe moe!")
 
         else:
             point_history.append([0, 0])
