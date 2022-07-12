@@ -213,13 +213,13 @@ def main():
 
                 # If hand sign and gesture combination is recognized, send message to Unity
                 if hand_sign_id == 0 and hand_movement == "Sideways":
-                    print("hi!!~")
+                    send_string("gesture:Wave")
                 elif hand_sign_id == 1 and hand_movement == "UpDown":
-                    print("nyan nyan!")
+                    send_string("gesture:Nyan")
                 elif hand_sign_id == 2 and hand_movement != "Stop":
-                    print("nico nico nii!!~~~")
+                    send_string("gesture:Nico")
                 elif hand_sign_id == 3 and hand_movement == "Sideways":
-                    print("moe moe!")
+                    send_string("gesture:Moe")
 
         else:
             point_history.append([0, 0])

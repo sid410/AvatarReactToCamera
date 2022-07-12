@@ -50,7 +50,7 @@ public class UnitychanMove : MonoBehaviour
 
     public enum InteractionGesture
     {
-        Finished, Hi
+        Idle, Wave, Nyan, Nico, Moe
     }
     public InteractionGesture Gesture
     {
@@ -80,8 +80,11 @@ public class UnitychanMove : MonoBehaviour
 
     private void AnimateUnityChan()
     {
-        // Add more gestures here
-        if (Gesture == InteractionGesture.Hi) InteractionHi();
+        // Add more gestures here - for managing the gesture state to its corresponding methods
+        if (Gesture == InteractionGesture.Wave) InteractionWave();
+        if (Gesture == InteractionGesture.Nyan) InteractionNyan();
+        if (Gesture == InteractionGesture.Nico) InteractionNico();
+        if (Gesture == InteractionGesture.Moe) InteractionMoe();
     }
 
 
@@ -171,7 +174,8 @@ public class UnitychanMove : MonoBehaviour
         }
     }
 
-    private void InteractionHi()
+    // methods for controlling animations
+    private void InteractionWave()
     {
         if (firstCallInteractionHi)
         {
@@ -188,7 +192,24 @@ public class UnitychanMove : MonoBehaviour
         {
             firstCallInteractionHi = true;
             animator.SetBool("isAutoHi", false);
-            ChangeGesture(InteractionGesture.Finished);
+            ChangeGesture(InteractionGesture.Idle);
         }
+    }
+    private void InteractionNyan()
+    {
+        //put here the animation logic like the one above in InteractionWave
+        // and make sure to return to idle state after finishing animation
+        Debug.Log("NyanNyan!");
+        ChangeGesture(InteractionGesture.Idle);
+    }
+    private void InteractionNico()
+    {
+        Debug.Log("NicoNicoNii!");
+        ChangeGesture(InteractionGesture.Idle);
+    }
+    private void InteractionMoe()
+    {
+        Debug.Log("MoeMoeKyun!");
+        ChangeGesture(InteractionGesture.Idle);
     }
 }

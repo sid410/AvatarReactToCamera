@@ -32,8 +32,11 @@ public class ListenMessages : MonoBehaviour
         switch (splitMsg[0])
         {
             case "gesture":
-                if (m_UnityChanMove.State != UnitychanMove.InteractionState.Start || m_UnityChanMove.Gesture != UnitychanMove.InteractionGesture.Finished) return;
-                if (splitMsg[1] == "interactionHi") m_UnityChanMove.Gesture = UnitychanMove.InteractionGesture.Hi;
+                if (m_UnityChanMove.State != UnitychanMove.InteractionState.Start || m_UnityChanMove.Gesture != UnitychanMove.InteractionGesture.Idle) return;
+                if (splitMsg[1] == "Wave") m_UnityChanMove.Gesture = UnitychanMove.InteractionGesture.Wave;
+                if (splitMsg[1] == "Nyan") m_UnityChanMove.Gesture = UnitychanMove.InteractionGesture.Nyan;
+                if (splitMsg[1] == "Nico") m_UnityChanMove.Gesture = UnitychanMove.InteractionGesture.Nico;
+                if (splitMsg[1] == "Moe") m_UnityChanMove.Gesture = UnitychanMove.InteractionGesture.Moe;
                 break;
 
             case "state":
