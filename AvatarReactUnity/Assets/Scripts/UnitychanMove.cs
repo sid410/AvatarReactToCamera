@@ -1,138 +1,175 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class UnitychanMove : MonoBehaviour
 {
-    [SerializeField]
-    private string message = "finished";
-    [SerializeField]
-    private float moveSpeed = 0.02f;
-
-    public string MovePositionControllerMessage
-    {
-        get { return message; }
-        set { message = value; }
-    }
-
     public Vector3 startPoint;
     public Vector3 startAngle;
-    public Vector3 destinationPoint;
+    public Vector3 distinationPoint;
     public Vector3 interactionTargetPoint;
     public Vector3 stanbyPoint;
-    
+    public string message;
+    public float moveSpeed;
+
     float rotateSpeed = 0.05f;
-    float destinationDistance = 0.1f;
+    float distinationDistance = 0.1f;
     float previousAngle;
     float startTime;
-    float interactionTime = 8.0f;
-    bool firstRotateGoDestination = false;
-    bool firstMoveGoDestination = false;
+    bool firstRotateGoDistination = false;
+    bool firstMoveGoDistination = false;
     bool seconRotateGoDistiantion = false;
+    bool isArriveDistination = false;
+    bool isGreetingFinished = false;
+    bool isAngered = false;
+    public float interactionHiTime = 6.0f;
+    public float interactionGetAwayTime = 6.75f;
+    public float intearactionCallOutTime = 6.25f;
+    public float inteactionDownheartTime = 8.75f;
+    public float interactionAngryTime = 9.0f;
     bool firstCallInteractionHi = true;
+    bool firstCallInteractionGetAway = true;
+    bool firstCallInteractionCallOut = true;
+    bool firstCallInteractionDownheart = true;
+    bool firstCallInteractionAngry = true;
     string animationName;
 
-    private Animator animator = null;
+    Animator animator = null;
 
-    // ------------for State and Logic Control of Interactions------------
-    public enum InteractionState
-    {
-        Stop, Start
-    }
-    public InteractionState State
-    {
-        get; set;
-    }
-    private void ChangeState(InteractionState newState)
-    {
-        if (State != newState) State = newState;
-    }
+    string userDistance = ""; //far, stable, close
+    string isWaving = ""; //true, false
+    bool isWaved = false;
 
-    public enum InteractionGesture
+    enum State
     {
-        Idle, Wave, Nyan, Nico, Moe
-    }
-    public InteractionGesture Gesture
-    {
-        get; set;
-    }
-    private void ChangeGesture(InteractionGesture newGesture)
-    {
-        if (Gesture != newGesture) Gesture = newGesture;
-    }
-    // ------------for State and Logic Control of Interactions------------
-
-
+        close,
+        far,
+        waved,
+        angry,
+        navigate,
+        downheart,
+        getAway,
+        callOut,
+        finished,
+    };
+    State nowState = State.far;
     private void Start()
     {
         animator = GetComponent<Animator>();
 
         this.gameObject.transform.position = startPoint;
         this.gameObject.transform.rotation = Quaternion.Euler(startAngle.x, startAngle.y, startAngle.z);
-        animationName = message;
     }
 
-    private void Update()
+    void Update()
     {
-        MovePositionController();
-        AnimateUnityChan();
+        motionController();
     }
 
-    private void AnimateUnityChan()
+    void motionController()
     {
-        // Add more gestures here - for managing the gesture state to its corresponding methods
-        if (Gesture == InteractionGesture.Wave) InteractionWave();
-        if (Gesture == InteractionGesture.Nyan) InteractionNyan();
-        if (Gesture == InteractionGesture.Nico) InteractionNico();
-        if (Gesture == InteractionGesture.Moe) InteractionMoe();
-    }
+        if (message.Split(',').Length == 2)
+        {
+            userDistance = message.Split(',')[0];
+            isWaving = message.Split(',')[1];
+            Debug.Log(userDistance + ", " + isWaving + ", " + nowState);
+            if ((userDistance == "stable" && isWaving == "true" && isGreetingFinished) || isAngered) // stable,true
+                nowState = State.navigate;
+            else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && !isWaved) // stable,false
+                nowState = State.callOut;
+            else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && isWaved) // stable,false
+                nowState = State.angry;
+            else if (userDistance == "far" && isAngered) // far,false / far,true
+                nowState = State.downheart;
+            else if (userDistance == "close" && isAngered) // close,false / close,true
+                nowState = State.getAway;
+            else if (userDistance == "far") // far,false / far,true
+                nowState = State.downheart;
+            else if (userDistance == "close") // close,false / close,true
+                nowState = State.getAway;
+            else if (userDistance == "stable" && isWaving == "false") // stable,false
+                nowState = State.waved;
+        }
 
-
-    private void MovePositionController()
-    {
-        if (message != animationName && animationName != "finished")
-            message = animationName;
+        if (nowState == State.finished)
+        {
+            setBools("all");
+        }
         else
-            switch (message)
+        {
+            switch (nowState)
             {
-                case "goDestination":
-                    if (goDestination(this.gameObject, destinationPoint, interactionTargetPoint))
+                case State.waved:
+                    if (isArriveDistination || goDistination(this.gameObject, distinationPoint, interactionTargetPoint))
                     {
-                        message = animationName = "finished";
-                        ChangeState(InteractionState.Start);
+                        isArriveDistination = true;
+                        if (interactionHi())
+                        {
+                            isGreetingFinished = true;
+                            nowState = State.finished;
+                            message = "finished";
+                        }
                     }
-                    else
-                        animationName = message;
                     break;
 
-                case "backStartPosition":
-                    ChangeState(InteractionState.Stop);
-
-                    if (goDestination(this.gameObject, startPoint, stanbyPoint))
+                case State.downheart:
+                    if (interactionDownheart())
                     {
-                        message = animationName = "finished";
+                        nowState = State.finished;
+                        message = "finished";
                     }
-                    else
-                        animationName = message;
                     break;
 
-                case "":
+                case State.getAway:
+                    if (interactionGetAway())
+                    {
+                        nowState = State.finished;
+                        message = "finished";
+                    }
+                    break;
+
+                case State.callOut:
+                    if (interactionCallOut())
+                    {
+                        isWaved = true;
+                        nowState = State.finished;
+                        message = "finished";
+                    }
+                    break;
+
+                case State.angry:
+                    if (interactionAngry())
+                    {
+                        isAngered = true;
+                        nowState = State.finished;
+                        message = "finished";
+                    }
+                    break;
+
+                case State.navigate:
+                    setBools("isNavigate");
+                    break;
+
+                default:
                     break;
             }
+        }
+
     }
 
-    private bool goDestination(GameObject target, Vector3 to, Vector3 interactDirection)
+    bool goDistination(GameObject target, Vector3 to, Vector3 interactDirection)
     {
-        if (firstRotateGoDestination || headDestination(target, to))
+        if (firstRotateGoDistination || headDistination(target, to))
         {
-            firstRotateGoDestination = true;
-            if (firstMoveGoDestination || moveToDestination(target, to))
+            firstRotateGoDistination = true;
+            if (firstMoveGoDistination || moveToDistination(target, to))
             {
-                firstMoveGoDestination = true;
-                if (seconRotateGoDistiantion || headDestination(target, interactDirection))
+                firstMoveGoDistination = true;
+                if (seconRotateGoDistiantion || headDistination(target, interactDirection))
                 {
-                    firstRotateGoDestination = false;
-                    firstMoveGoDestination = false;
+                    firstRotateGoDistination = false;
+                    firstMoveGoDistination = false;
                     seconRotateGoDistiantion = false;
                     animator.SetBool("isAutoWalk", false);
                     return true;
@@ -143,7 +180,7 @@ public class UnitychanMove : MonoBehaviour
         return false;
     }
 
-    private bool headDestination(GameObject target, Vector3 to)
+    bool headDistination(GameObject target, Vector3 to)
     {
         float angle = Vector3.Angle(target.transform.position - to, target.transform.forward);
         if (Mathf.Abs(previousAngle - angle) < 0.01f)
@@ -163,9 +200,9 @@ public class UnitychanMove : MonoBehaviour
         return false;
     }
 
-    private bool moveToDestination(GameObject target, Vector3 to)
+    bool moveToDistination(GameObject target, Vector3 to)
     {
-        if (Vector3.Distance(target.transform.position, to) < destinationDistance)
+        if (Vector3.Distance(target.transform.position, to) < distinationDistance)
             return true;
         else
         {
@@ -174,42 +211,184 @@ public class UnitychanMove : MonoBehaviour
         }
     }
 
-    // methods for controlling animations
-    private void InteractionWave()
+    bool interactionHi()
     {
         if (firstCallInteractionHi)
         {
             startTime = Time.time;
             firstCallInteractionHi = false;
         }
-
-        // Changed so that it will interrupt gesture animation when person leave the interaction area
-        if (Time.time - startTime < interactionTime && State == InteractionState.Start)
+        if (Time.time - startTime < interactionHiTime)
         {
             animator.SetBool("isAutoHi", true);
+            return false;
         }
         else
         {
             firstCallInteractionHi = true;
             animator.SetBool("isAutoHi", false);
-            ChangeGesture(InteractionGesture.Idle);
+            return true;
         }
     }
-    private void InteractionNyan()
+
+    bool interactionGetAway()
     {
-        //put here the animation logic like the one above in InteractionWave
-        // and make sure to return to idle state after finishing animation
-        Debug.Log("NyanNyan!");
-        ChangeGesture(InteractionGesture.Idle);
+        if (firstCallInteractionGetAway)
+        {
+            startTime = Time.time;
+            firstCallInteractionGetAway = false;
+        }
+        if (Time.time - startTime < interactionGetAwayTime)
+        {
+            animator.SetBool("isAutoGetAway", true);
+            return false;
+        }
+        else
+        {
+            firstCallInteractionGetAway = true;
+            animator.SetBool("isGetAway", false);
+            return true;
+        }
     }
-    private void InteractionNico()
+
+    bool interactionCallOut()
     {
-        Debug.Log("NicoNicoNii!");
-        ChangeGesture(InteractionGesture.Idle);
+        if (firstCallInteractionCallOut)
+        {
+            startTime = Time.time;
+            firstCallInteractionCallOut = false;
+        }
+        if (Time.time - startTime < intearactionCallOutTime)
+        {
+            animator.SetBool("isCallOut", true);
+            return false;
+        }
+        else
+        {
+            firstCallInteractionCallOut = true;
+            animator.SetBool("isCallOut", false);
+            return true;
+        }
     }
-    private void InteractionMoe()
+
+    bool interactionAngry()
     {
-        Debug.Log("MoeMoeKyun!");
-        ChangeGesture(InteractionGesture.Idle);
+        if (firstCallInteractionAngry)
+        {
+            startTime = Time.time;
+            firstCallInteractionAngry = false;
+        }
+        if (Time.time - startTime < interactionAngryTime)
+        {
+            animator.SetBool("isAngry", true);
+            return false;
+        }
+        else
+        {
+            firstCallInteractionAngry = true;
+            animator.SetBool("isAngry", false);
+            return true;
+        }
+    }
+
+    bool interactionDownheart()
+    {
+        if (firstCallInteractionDownheart)
+        {
+            startTime = Time.time;
+            firstCallInteractionDownheart = false;
+        }
+        if (Time.time - startTime < inteactionDownheartTime)
+        {
+            animator.SetBool("isDownheart", true);
+            return false;
+        }
+        else
+        {
+            firstCallInteractionDownheart = true;
+            animator.SetBool("isDownheart", false);
+            return true;
+        }
+    }
+
+    void setBools(string boolName)
+    {
+        switch (boolName)
+        {
+            case "isAutoWalk":
+                animator.SetBool("isAutoWalk", true);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", false);
+                break;
+            case "isAutoHi":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", true);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", false);
+                break;
+            case "isDownheart":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", true);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", false);
+                break;
+            case "isAngry":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", true);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", false);
+                break;
+            case "isCallOut":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", true);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", false);
+                break;
+            case "isGetAway":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", true);
+                animator.SetBool("isNavigate", false);
+                break;
+            case "isNavigate":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", true);
+                break;
+            case "all":
+                animator.SetBool("isAutoWalk", false);
+                animator.SetBool("isAutoHi", false);
+                animator.SetBool("isDownheart", false);
+                animator.SetBool("isAngry", false);
+                animator.SetBool("isCallOut", false);
+                animator.SetBool("isGetAway", false);
+                animator.SetBool("isNavigate", false);
+                break;
+            default:
+                break;
+        }
     }
 }
