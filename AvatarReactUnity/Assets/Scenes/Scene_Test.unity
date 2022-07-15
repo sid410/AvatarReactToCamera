@@ -423,11 +423,15 @@ MonoBehaviour:
   stanbyPoint: {x: 0, y: 0, z: 0}
   message: finished
   moveSpeed: 0.05
+  migratoryPoint1: {x: 8, y: 0, z: 8}
+  migratoryPoint2: {x: 8, y: 0, z: -8}
+  migratoryPoint3: {x: -8, y: 0, z: -8}
+  migratoryPoint4: {x: -8, y: 0, z: 8}
   interactionHiTime: 6
   interactionGetAwayTime: 6.75
   intearactionCallOutTime: 6.25
   inteactionDownheartTime: 8.75
-  interactionAngryTime: 9
+  interactionAngryTime: 7
 --- !u!850595691 &1423872627
 LightingSettings:
   m_ObjectHideFlags: 0

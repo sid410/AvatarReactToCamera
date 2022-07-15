@@ -13,6 +13,11 @@ public class UnitychanMove : MonoBehaviour
     public string message;
     public float moveSpeed;
 
+    public Vector3 migratoryPoint1 = new Vector3(8, 0, 8);
+    public Vector3 migratoryPoint2 = new Vector3(8, 0, -8);
+    public Vector3 migratoryPoint3 = new Vector3(-8, 0, -8);
+    public Vector3 migratoryPoint4 = new Vector3(-8, 0, 8);
+
     float rotateSpeed = 0.05f;
     float distinationDistance = 0.1f;
     float previousAngle;
@@ -54,6 +59,19 @@ public class UnitychanMove : MonoBehaviour
         finished,
     };
     State nowState = State.far;
+
+    enum migratoryState
+    {
+        start,
+        point1ToPoint2,
+        point2ToPoint3,
+        point3ToPoint4,
+        point4ToPoint1,
+    }
+    migratoryState nowMigratoryState = migratoryState.start;
+    bool isMigratory = false;
+    bool firstCallMotionController = true;
+
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -62,35 +80,71 @@ public class UnitychanMove : MonoBehaviour
         this.gameObject.transform.rotation = Quaternion.Euler(startAngle.x, startAngle.y, startAngle.z);
     }
 
-    void Update()
-    {
-        motionController();
-    }
-
-    void motionController()
+    void FixedUpdate()
     {
         if (message.Split(',').Length == 2)
         {
-            userDistance = message.Split(',')[0];
-            isWaving = message.Split(',')[1];
-            Debug.Log(userDistance + ", " + isWaving + ", " + nowState);
-            if ((userDistance == "stable" && isWaving == "true" && isGreetingFinished) || isAngered) // stable,true
-                nowState = State.navigate;
-            else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && !isWaved) // stable,false
-                nowState = State.callOut;
-            else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && isWaved) // stable,false
-                nowState = State.angry;
-            else if (userDistance == "far" && isAngered) // far,false / far,true
-                nowState = State.downheart;
-            else if (userDistance == "close" && isAngered) // close,false / close,true
-                nowState = State.getAway;
-            else if (userDistance == "far") // far,false / far,true
-                nowState = State.downheart;
-            else if (userDistance == "close") // close,false / close,true
-                nowState = State.getAway;
-            else if (userDistance == "stable" && isWaving == "false") // stable,false
-                nowState = State.waved;
+            isMigratory = true;
+            if (firstCallMotionController)
+            {
+                firstRotateGoDistination = false;
+                firstMoveGoDistination = false;
+                seconRotateGoDistiantion = false;
+                firstCallMotionController = false;
+            }
+            motionController(message.Split(',')[0], message.Split(',')[1]);
         }
+        else if (isMigratory)
+            motionController("", "");
+        else
+            migratoryMove(migratoryPoint1, migratoryPoint2, migratoryPoint3, migratoryPoint4);
+    }
+
+    void migratoryMove(Vector3 point1, Vector3 point2, Vector3 point3, Vector3 point4)
+    {
+        switch (nowMigratoryState)
+        {
+            case migratoryState.start:
+                if (goDistination(this.gameObject, point1, point2))
+                    nowMigratoryState = migratoryState.point1ToPoint2;
+                break;
+            case migratoryState.point1ToPoint2:
+                if (goDistination(this.gameObject, point2, point3))
+                    nowMigratoryState = migratoryState.point2ToPoint3;
+                break;
+            case migratoryState.point2ToPoint3:
+                if (goDistination(this.gameObject, point3, point4))
+                    nowMigratoryState = migratoryState.point3ToPoint4;
+                break;
+            case migratoryState.point3ToPoint4:
+                if (goDistination(this.gameObject, point4, point1))
+                    nowMigratoryState = migratoryState.point4ToPoint1;
+                break;
+            case migratoryState.point4ToPoint1:
+                if (goDistination(this.gameObject, point1, point2))
+                    nowMigratoryState = migratoryState.point1ToPoint2;
+                break;
+        }
+    }
+
+    void motionController(string userDistance, string isWaving)
+    {
+        if ((userDistance == "stable" && isWaving == "true" && isGreetingFinished) || isAngered) // stable,true
+            nowState = State.navigate;
+        else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && !isWaved) // stable,false
+            nowState = State.callOut;
+        else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && isWaved) // stable,false
+            nowState = State.angry;
+        else if (userDistance == "far" && isAngered) // far,false / far,true
+            nowState = State.downheart;
+        else if (userDistance == "close" && isAngered) // close,false / close,true
+            nowState = State.getAway;
+        else if (userDistance == "far") // far,false / far,true
+            nowState = State.downheart;
+        else if (userDistance == "close") // close,false / close,true
+            nowState = State.getAway;
+        else if (userDistance == "stable" && isWaving == "false") // stable,false
+            nowState = State.waved;
 
         if (nowState == State.finished)
         {
