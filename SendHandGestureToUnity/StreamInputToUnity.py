@@ -28,7 +28,8 @@ from model import PointHistoryClassifier
 from realsensecv import RealsenseCapture
 
 # Constant to define where the interaction border starts
-CONST_BORDER_INTERACT = 1.5
+CONST_CLOSE_BORDER_INTERACT = 1.5
+CONST_FAR_BORDER_INTERACT = 2.5
 
 
 # Create UDP socket at client side 
@@ -155,6 +156,8 @@ def main():
         results = hands.process(image)
         image.flags.writeable = True
 
+        #  message for sending####################################################################
+        interaction_message = ""
         #  ####################################################################
         if results.multi_hand_landmarks is not None:
             for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
@@ -214,12 +217,15 @@ def main():
                 # If hand sign and gesture combination is recognized, send message to Unity
                 if hand_sign_id == 0 and hand_movement == "Sideways":
                     send_string("gesture:Wave")
+                    #interaction_message = "true"
                 elif hand_sign_id == 1 and hand_movement == "UpDown":
                     send_string("gesture:Nyan")
                 elif hand_sign_id == 2 and hand_movement != "Stop":
                     send_string("gesture:Nico")
                 elif hand_sign_id == 3 and hand_movement == "Sideways":
                     send_string("gesture:Moe")
+                #else:
+                #   interaction_message = "false"
 
         else:
             point_history.append([0, 0])
@@ -233,11 +239,18 @@ def main():
 
         # Draw circle at center and change to green/red if enter/exit the interaciton area
         # And notify Unity that State has changed
-        debug_image = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
+        debug_image, distance_message = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
 
 
         # Screen reflection #############################################################
         cv.imshow('Hand Gesture Recognition', debug_image)
+
+        # Send message ##################################################################
+        #if interaction_message == "":
+        #    message = distance_message
+        #else:
+        #    message = distance_message + "," + interaction_message
+        #send_string(message)
 
     cap.release()
     cv.destroyAllWindows()
@@ -602,14 +615,20 @@ def draw_info(image, fps, mode, number):
 
 # ADDED draw center circle: red if out of interaction area, green if inside
 def state_center_circle(image, width, height, depth):
-    if depth <= CONST_BORDER_INTERACT:
+    distance_message = ""
+    if 0 < depth <= CONST_FAR_BORDER_INTERACT:
         cv.circle(image, (int(width/2), int(height/2)), 5, (0, 255, 0), 5)
         send_string("state:InteractionStart")
+        #distance_message = "close"
+    #elif CONST_CLOSE_BORDER_INTERACT < depth <CONST_FAR_BORDER_INTERACT:
+    #    cv.circle(image, (int(width/2), int(height/2)), 5, (255, 0, 0), 5)
+    #    distance_message = "stable"
     else:
         cv.circle(image, (int(width/2), int(height/2)), 5, (0, 0, 255), 5)
         send_string("state:InteractionStop")
+        #distance_message = "far"
 
-    return image
+    return (image, distance_message)
 
 if __name__ == '__main__':
     main()
