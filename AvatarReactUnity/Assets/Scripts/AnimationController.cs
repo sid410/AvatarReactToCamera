@@ -20,7 +20,24 @@ public class AnimationController : MonoBehaviour
     public Vector3 destinationPoint;
     public Vector3 interactionTargetPoint;
     public Vector3 stanbyPoint;
-    
+
+    public Vector3 migratoryPoint1 = new Vector3(4, 0, 7.5f);
+    public Vector3 migratoryPoint2 = new Vector3(4, 0, -8);
+    public Vector3 migratoryPoint3 = new Vector3(-4, 0, -8);
+    public Vector3 migratoryPoint4 = new Vector3(-4, 0, 7.5f);
+
+    enum migratoryState
+    {
+        start,
+        point1ToPoint2,
+        point2ToPoint3,
+        point3ToPoint4,
+        point4ToPoint1,
+    }
+    migratoryState nowMigratoryState = migratoryState.start;
+    bool isMigratory = false;
+    bool firstCallMotionController = true;
+
     float rotateSpeed = 0.05f;
     float destinationDistance = 0.1f;
     float previousAngle;
@@ -74,8 +91,25 @@ public class AnimationController : MonoBehaviour
 
     private void Update()
     {
-        MovePositionController();
-        AnimateUnityChan();
+        if (message == "goDestination" || isMigratory)
+        {
+            isMigratory = true;
+            nowMigratoryState = migratoryState.start;
+            if (firstCallMotionController)
+            {
+                firstCallMotionController = false;
+                firstRotateGoDestination = false;
+                firstMoveGoDestination = false;
+                seconRotateGoDistiantion = false;
+                firstCallMotionController = false;
+            }
+            MovePositionController();
+            AnimateUnityChan();
+        }
+        else
+        {
+            migratoryMove(migratoryPoint1, migratoryPoint2, migratoryPoint3, migratoryPoint4);
+        }
     }
 
     private void AnimateUnityChan()
@@ -107,16 +141,23 @@ public class AnimationController : MonoBehaviour
 
                 case "backStartPosition":
                     ChangeState(InteractionState.Stop);
-
                     if (goDestination(this.gameObject, startPoint, stanbyPoint))
                     {
+                        firstCallMotionController = true;
+                        isMigratory = false;
                         message = animationName = "finished";
                     }
                     else
                         animationName = message;
                     break;
 
-                case "":
+                case "interactionHi":
+                    if (interactionHi())
+                    {
+                        message = animationName = "finished";
+                    }
+                    else
+                        animationName = message;
                     break;
             }
     }
@@ -195,6 +236,28 @@ public class AnimationController : MonoBehaviour
             ChangeGesture(InteractionGesture.Idle);
         }
     }
+
+    bool interactionHi()
+    {
+        if (firstCallInteractionHi)
+        {
+            startTime = Time.time;
+            firstCallInteractionHi = false;
+        }
+        if (Time.time - startTime < interactionTime)
+        {
+            animator.SetBool("isAutoHi", true);
+            return false;
+        }
+        else
+        {
+            firstCallInteractionHi = true;
+            animator.SetBool("isAutoHi", false);
+            return true;
+        }
+    }
+
+
     private void InteractionNyan()
     {
         //put here the animation logic like the one above in InteractionWave
@@ -211,5 +274,32 @@ public class AnimationController : MonoBehaviour
     {
         Debug.Log("MoeMoeKyun!");
         ChangeGesture(InteractionGesture.Idle);
+    }
+
+    void migratoryMove(Vector3 point1, Vector3 point2, Vector3 point3, Vector3 point4)
+    {
+        switch (nowMigratoryState)
+        {
+            case migratoryState.start:
+                if (goDestination(this.gameObject, point1, point2))
+                    nowMigratoryState = migratoryState.point1ToPoint2;
+                break;
+            case migratoryState.point1ToPoint2:
+                if (goDestination(this.gameObject, point2, point3))
+                    nowMigratoryState = migratoryState.point2ToPoint3;
+                break;
+            case migratoryState.point2ToPoint3:
+                if (goDestination(this.gameObject, point3, point4))
+                    nowMigratoryState = migratoryState.point3ToPoint4;
+                break;
+            case migratoryState.point3ToPoint4:
+                if (goDestination(this.gameObject, point4, point1))
+                    nowMigratoryState = migratoryState.point4ToPoint1;
+                break;
+            case migratoryState.point4ToPoint1:
+                if (goDestination(this.gameObject, point1, point2))
+                    nowMigratoryState = migratoryState.point1ToPoint2;
+                break;
+        }
     }
 }

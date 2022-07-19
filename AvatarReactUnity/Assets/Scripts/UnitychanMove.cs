@@ -11,12 +11,17 @@ public class UnitychanMove : MonoBehaviour
     public Vector3 interactionTargetPoint;
     public Vector3 stanbyPoint;
     public string message;
+    public string MovePositionControllerMessage
+    {
+        get { return message; }
+        set { message = value; }
+    }
     public float moveSpeed;
 
-    public Vector3 migratoryPoint1 = new Vector3(8, 0, 8);
-    public Vector3 migratoryPoint2 = new Vector3(8, 0, -8);
-    public Vector3 migratoryPoint3 = new Vector3(-8, 0, -8);
-    public Vector3 migratoryPoint4 = new Vector3(-8, 0, 8);
+    public Vector3 migratoryPoint1 = new Vector3(4, 0, 7.5f);
+    public Vector3 migratoryPoint2 = new Vector3(4, 0, -8);
+    public Vector3 migratoryPoint3 = new Vector3(-4, 0, -8);
+    public Vector3 migratoryPoint4 = new Vector3(-4, 0, 7.5f);
 
     float rotateSpeed = 0.05f;
     float distinationDistance = 0.1f;
@@ -82,20 +87,21 @@ public class UnitychanMove : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (message.Split(',').Length == 2)
-        {
-            isMigratory = true;
-            if (firstCallMotionController)
+        if (message.Split(',')[0] != "far")
+            if (message.Split(',').Length == 2)
             {
-                firstRotateGoDistination = false;
-                firstMoveGoDistination = false;
-                seconRotateGoDistiantion = false;
-                firstCallMotionController = false;
+                isMigratory = true;
+                if (firstCallMotionController)
+                {
+                    firstRotateGoDistination = false;
+                    firstMoveGoDistination = false;
+                    seconRotateGoDistiantion = false;
+                    firstCallMotionController = false;
+                }
+                motionController(message.Split(',')[0], message.Split(',')[1]);
             }
-            motionController(message.Split(',')[0], message.Split(',')[1]);
-        }
-        else if (isMigratory)
-            motionController("", "");
+            else if (isMigratory)
+                motionController("", "");
         else
             migratoryMove(migratoryPoint1, migratoryPoint2, migratoryPoint3, migratoryPoint4);
     }
@@ -136,11 +142,17 @@ public class UnitychanMove : MonoBehaviour
         else if (userDistance == "stable" && isWaving == "false" && isGreetingFinished && isWaved) // stable,false
             nowState = State.angry;
         else if (userDistance == "far" && isAngered) // far,false / far,true
+        {
             nowState = State.downheart;
+            isMigratory = false;
+        }
         else if (userDistance == "close" && isAngered) // close,false / close,true
             nowState = State.getAway;
         else if (userDistance == "far") // far,false / far,true
+        {
             nowState = State.downheart;
+            isMigratory = false;
+        }
         else if (userDistance == "close") // close,false / close,true
             nowState = State.getAway;
         else if (userDistance == "stable" && isWaving == "false") // stable,false
@@ -202,7 +214,7 @@ public class UnitychanMove : MonoBehaviour
                     break;
 
                 case State.navigate:
-                    setBools("isNavigate");
+                    //setBools("isNavigate");
                     break;
 
                 default:
