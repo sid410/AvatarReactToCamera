@@ -7,6 +7,8 @@
 # Changes to this script are as follows:
 # - added realsense implementation that separate color and depth frames
 # - added UDP client to stream depth and hand interaction state to unity
+# - only consider gestures of hands that are the set handedness and within the detection depth
+#   (this is however a big fps hit because mediapipe still continues to track the ignored hands in the background)
 
 import csv
 import copy
@@ -30,6 +32,10 @@ from realsensecv import RealsenseCapture
 # Constant to define where the interaction border starts
 CONST_CLOSE_BORDER_INTERACT = 1.5
 CONST_FAR_BORDER_INTERACT = 2.5
+
+CONST_WRIST_DETECTION_DEPTH = 1
+CONST_MAX_NUM_HANDS = 4
+CONST_HANDEDNESS_TO_TRACK = "Right"
 
 
 # Create UDP socket at client side 
@@ -93,7 +99,7 @@ def main():
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(
         static_image_mode=use_static_image_mode,
-        max_num_hands=1,
+        max_num_hands=CONST_MAX_NUM_HANDS,
         min_detection_confidence=min_detection_confidence,
         min_tracking_confidence=min_tracking_confidence,
     )
@@ -162,10 +168,23 @@ def main():
         if results.multi_hand_landmarks is not None:
             for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
                                                   results.multi_handedness):
+                
+                # Ignore if not the correct handedness to track (set Left/Right constant above)
+                if handedness.classification[0].label[0:] != CONST_HANDEDNESS_TO_TRACK:
+                    continue
+
                 # Bounding box calculation
                 brect = calc_bounding_rect(debug_image, hand_landmarks)
                 # Landmark calculation
                 landmark_list = calc_landmark_list(debug_image, hand_landmarks)
+
+                # Because RGB is mirrored, we mirror the depth info when finding wrist
+                # Also ignore hands that are out of the acceptable detection depth
+                if 0 < landmark_list[9][0] < cap_width and 0 < landmark_list[9][1] < cap_height:
+                    wristDepth = cap.depth_frame.get_distance((cap_width - landmark_list[9][0]), landmark_list[9][1])
+                    if wristDepth > CONST_WRIST_DETECTION_DEPTH:
+                        continue
+                    #cv.circle(debug_image, (landmark_list[9][0], landmark_list[9][1]), 5, (255, 0, 0), 5)
 
                 # Conversion to relative coordinates / normalized coordinates
                 pre_processed_landmark_list = pre_process_landmark(
@@ -212,6 +231,7 @@ def main():
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
 
+                # Detect the hand gesture based from the loaded model
                 hand_movement = point_history_classifier_labels[most_common_fg_id[0][0]]
 
                 # If hand sign and gesture combination is recognized, send message to Unity
@@ -235,11 +255,11 @@ def main():
 
 
         # Depth acquisition #############################################################
-        centerDepth = cap.depth_frame.get_distance(int(cap_width/2), int(cap_height/2))
+        #centerDepth = cap.depth_frame.get_distance(int(cap_width/2), int(cap_height/2))
 
         # Draw circle at center and change to green/red if enter/exit the interaciton area
         # And notify Unity that State has changed
-        debug_image, distance_message = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
+        #debug_image, distance_message = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
 
 
         # Screen reflection #############################################################
