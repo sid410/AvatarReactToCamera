@@ -16,20 +16,66 @@ public class UnitychanMove : MonoBehaviour
     float distinationDistance = 0.1f;
     float previousAngle;
     float startTime;
+<<<<<<< Updated upstream
     float interactionTime = 8.0f;
     bool firstRotateGoDistination = false;
     bool firstMoveGoDistination = false;
+=======
+    float interactionWaveTime = 8.0f;
+    float interactionMoeTime = 8.0f;
+    bool firstRotateGoDestination = false;
+    bool firstMoveGoDestination = false;
+>>>>>>> Stashed changes
     bool seconRotateGoDistiantion = false;
-    bool firstCallInteractionHi = true;
+    bool firstCallInteractionWave = true;
+    bool firstCallInteractionMoe = false;
     string animationName;
 
+<<<<<<< Updated upstream
     Animator animator = null;
+=======
+    private Animator animator = null;
+
+    [SerializeField]
+    private GameObject anotherObj;
+    UnitychanMove anotherScript;
+    bool calledObject = false;
+
+    // ------------for State and Logic Control of Interactions------------
+    public enum InteractionState
+    {
+        Stop, Start
+    }
+    public InteractionState State
+    {
+        get; set;
+    }
+    private void ChangeState(InteractionState newState)
+    {
+        if (State != newState) State = newState;
+    }
+
+    public enum InteractionGesture
+    {
+        Idle, Wave, Nyan, Nico, Moe
+    }
+    public InteractionGesture Gesture
+    {
+        get; set;
+    }
+    private void ChangeGesture(InteractionGesture newGesture)
+    {
+        if (Gesture != newGesture) Gesture = newGesture;
+    }
+    // ------------for State and Logic Control of Interactions------------
+>>>>>>> Stashed changes
 
 
     private void Start()
     {
         animator = GetComponent<Animator>();
-
+        anotherScript = anotherObj.GetComponent<UnitychanMove>();
+        if (this.gameObject.name == "unitychan") calledObject = true;
         this.gameObject.transform.position = startPoint;
         this.gameObject.transform.rotation = Quaternion.Euler(startAngle.x, startAngle.y, startAngle.z);
         animationName = message;
@@ -37,7 +83,15 @@ public class UnitychanMove : MonoBehaviour
 
     void Update()
     {
+<<<<<<< Updated upstream
         motionController();
+=======
+        if (!anotherScript.calledObject){
+            calledObject = true;
+            MovePositionController();
+            AnimateUnityChan();
+        }
+>>>>>>> Stashed changes
     }
 
     void motionController()
@@ -64,6 +118,12 @@ public class UnitychanMove : MonoBehaviour
                 case "backStartPosition":
                     if (goDistination(this.gameObject, startPoint, stanbyPoint))
                         message = animationName = "finished";
+<<<<<<< Updated upstream
+=======
+                        calledObject = false;
+                        anotherScript.calledObject = true;
+                    }
+>>>>>>> Stashed changes
                     else
                         animationName = message;
                     break;
@@ -128,12 +188,13 @@ public class UnitychanMove : MonoBehaviour
 
     bool interactionHi()
     {
-        if (firstCallInteractionHi)
+        if (firstCallInteractionWave)
         {
             startTime = Time.time;
-            firstCallInteractionHi = false;
+            firstCallInteractionWave = false;
         }
 
+<<<<<<< Updated upstream
         if (Time.time - startTime < interactionTime)
         {
             animator.SetBool("isAutoHi", true);
@@ -146,4 +207,52 @@ public class UnitychanMove : MonoBehaviour
             return true;
         }
     }
+=======
+        // Changed so that it will interrupt gesture animation when person leave the interaction area
+        if (Time.time - startTime < interactionWaveTime && State == InteractionState.Start)
+        {
+            animator.SetBool("isAutoWave", true);
+        }
+        else
+        {
+            firstCallInteractionWave = true;
+            animator.SetBool("isAutoWave", false);
+            ChangeGesture(InteractionGesture.Idle);
+        }
+    }
+    private void InteractionNyan()
+    {
+        //put here the animation logic like the one above in InteractionWave
+        // and make sure to return to idle state after finishing animation
+        Debug.Log("NyanNyan!");
+        ChangeGesture(InteractionGesture.Idle);
+    }
+    private void InteractionNico()
+    {
+        Debug.Log("NicoNicoNii!");
+        ChangeGesture(InteractionGesture.Idle);
+    }
+    private void InteractionMoe()
+    {
+        // Debug.Log("MoeMoeKyun!");
+        // ChangeGesture(InteractionGesture.Idle);
+        if (firstCallInteractionMoe)
+        {
+            startTime = Time.time;
+            firstCallInteractionMoe = false;
+        }
+
+        // Changed so that it will interrupt gesture animation when person leave the interaction area
+        if (Time.time - startTime < interactionMoeTime && State == InteractionState.Start)
+        {
+            animator.SetBool("isAutoMoe", true);
+        }
+        else
+        {
+            firstCallInteractionMoe = true;
+            animator.SetBool("isAutoMoe", false);
+            ChangeGesture(InteractionGesture.Idle);
+        }
+    }
+>>>>>>> Stashed changes
 }
