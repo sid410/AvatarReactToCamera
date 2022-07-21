@@ -213,13 +213,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f544977ac0b4b178b4800a4cca799f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPoint: {x: 0, y: 0, z: 1.5}
-  startAngle: {x: 0, y: 180, z: 0}
-  distinationPoint: {x: 6, y: 0, z: 1.5}
-  interactionTargetPoint: {x: 6, y: 0, z: -1.5}
-  stanbyPoint: {x: 0, y: 0, z: 0}
   message: finished
   moveSpeed: 0.02
+  startPoint: {x: 0, y: 0, z: 1.5}
+  startAngle: {x: 0, y: 180, z: 0}
+  destinationPoint: {x: 6, y: 0, z: 1.5}
+  interactionTargetPoint: {x: 6, y: 0, z: -1.5}
+  stanbyPoint: {x: 0, y: 0, z: 0}
 --- !u!1 &388430764
 GameObject:
   m_ObjectHideFlags: 0
