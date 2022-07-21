@@ -4,36 +4,36 @@ using UnityEngine;
 
 public class UnitychanMove : MonoBehaviour
 {
+    [SerializeField]
+    private string message = "finished";
+    [SerializeField]
+    private float moveSpeed = 0.02f;
+
+    public string MovePositionControllerMessage
+    {
+        get { return message; }
+        set { message = value; }
+    }
+
     public Vector3 startPoint;
     public Vector3 startAngle;
-    public Vector3 distinationPoint;
+    public Vector3 DestinationPoint;
     public Vector3 interactionTargetPoint;
     public Vector3 stanbyPoint;
-    public string message;
-    public float moveSpeed;
 
     float rotateSpeed = 0.05f;
-    float distinationDistance = 0.1f;
+    float DestinationDistance = 0.1f;
     float previousAngle;
     float startTime;
-<<<<<<< Updated upstream
-    float interactionTime = 8.0f;
-    bool firstRotateGoDistination = false;
-    bool firstMoveGoDistination = false;
-=======
     float interactionWaveTime = 8.0f;
     float interactionMoeTime = 8.0f;
     bool firstRotateGoDestination = false;
     bool firstMoveGoDestination = false;
->>>>>>> Stashed changes
     bool seconRotateGoDistiantion = false;
     bool firstCallInteractionWave = true;
     bool firstCallInteractionMoe = false;
     string animationName;
 
-<<<<<<< Updated upstream
-    Animator animator = null;
-=======
     private Animator animator = null;
 
     [SerializeField]
@@ -68,7 +68,6 @@ public class UnitychanMove : MonoBehaviour
         if (Gesture != newGesture) Gesture = newGesture;
     }
     // ------------for State and Logic Control of Interactions------------
->>>>>>> Stashed changes
 
 
     private void Start()
@@ -83,47 +82,45 @@ public class UnitychanMove : MonoBehaviour
 
     void Update()
     {
-<<<<<<< Updated upstream
-        motionController();
-=======
         if (!anotherScript.calledObject){
             calledObject = true;
             MovePositionController();
             AnimateUnityChan();
         }
->>>>>>> Stashed changes
     }
 
-    void motionController()
+    private void AnimateUnityChan()
     {
-        if (message != animationName && animationName != "finished")
-            message = animationName;
-        else
-            switch (message)
-            {
-                case "goDistination":
-                    if (goDistination(this.gameObject, distinationPoint, interactionTargetPoint))
-                        message = animationName = "finished";
-                    else
-                        animationName = message;
-                    break;
+        // Add more gestures here
+        if (Gesture == InteractionGesture.Wave) InteractionWave();
+        if (Gesture == InteractionGesture.Moe) InteractionMoe();
+    }
 
-                case "interactionHi":
-                    if (interactionHi())
+    private void MovePositionController()
+    {
+        if (MovePositionControllerMessage != animationName && animationName != "finished")
+            MovePositionControllerMessage = animationName;
+        else
+            switch (MovePositionControllerMessage)
+            {
+                case "goDestination":
+                    if (goDestination(this.gameObject, DestinationPoint, interactionTargetPoint))
+                    {
                         message = animationName = "finished";
+                        ChangeState(InteractionState.Start);
+                    }
                     else
                         animationName = message;
                     break;
 
                 case "backStartPosition":
-                    if (goDistination(this.gameObject, startPoint, stanbyPoint))
+                    ChangeState(InteractionState.Stop);
+                    if (goDestination(this.gameObject, startPoint, stanbyPoint))
+                    {
                         message = animationName = "finished";
-<<<<<<< Updated upstream
-=======
                         calledObject = false;
                         anotherScript.calledObject = true;
                     }
->>>>>>> Stashed changes
                     else
                         animationName = message;
                     break;
@@ -133,18 +130,18 @@ public class UnitychanMove : MonoBehaviour
             }
     }
 
-    bool goDistination(GameObject target, Vector3 to, Vector3 interactDirection)
+    private bool goDestination(GameObject target, Vector3 to, Vector3 interactDirection)
     {
-        if (firstRotateGoDistination || headDistination(target, to))
+        if (firstRotateGoDestination || headDestination(target, to))
         {
-            firstRotateGoDistination = true;
-            if (firstMoveGoDistination || moveToDistination(target, to))
+            firstRotateGoDestination = true;
+            if (firstMoveGoDestination || moveToDestination(target, to))
             {
-                firstMoveGoDistination = true;
-                if (seconRotateGoDistiantion || headDistination(target, interactDirection))
+                firstMoveGoDestination = true;
+                if (seconRotateGoDistiantion || headDestination(target, interactDirection))
                 {
-                    firstRotateGoDistination = false;
-                    firstMoveGoDistination = false;
+                    firstRotateGoDestination = false;
+                    firstMoveGoDestination = false;
                     seconRotateGoDistiantion = false;
                     animator.SetBool("isAutoWalk", false);
                     return true;
@@ -155,7 +152,7 @@ public class UnitychanMove : MonoBehaviour
         return false;
     }
 
-    bool headDistination(GameObject target, Vector3 to)
+    private bool headDestination(GameObject target, Vector3 to)
     {
         float angle = Vector3.Angle(target.transform.position - to, target.transform.forward);
         if (Mathf.Abs(previousAngle - angle) < 0.01f)
@@ -175,9 +172,9 @@ public class UnitychanMove : MonoBehaviour
         return false;
     }
 
-    bool moveToDistination(GameObject target, Vector3 to)
+    private bool moveToDestination(GameObject target, Vector3 to)
     {
-        if (Vector3.Distance(target.transform.position, to) < distinationDistance)
+        if (Vector3.Distance(target.transform.position, to) < DestinationDistance)
             return true;
         else
         {
@@ -186,7 +183,7 @@ public class UnitychanMove : MonoBehaviour
         }
     }
 
-    bool interactionHi()
+    private void InteractionWave()
     {
         if (firstCallInteractionWave)
         {
@@ -194,20 +191,6 @@ public class UnitychanMove : MonoBehaviour
             firstCallInteractionWave = false;
         }
 
-<<<<<<< Updated upstream
-        if (Time.time - startTime < interactionTime)
-        {
-            animator.SetBool("isAutoHi", true);
-            return false;
-        }
-        else
-        {
-            firstCallInteractionHi = true;
-            animator.SetBool("isAutoHi", false);
-            return true;
-        }
-    }
-=======
         // Changed so that it will interrupt gesture animation when person leave the interaction area
         if (Time.time - startTime < interactionWaveTime && State == InteractionState.Start)
         {
@@ -254,5 +237,4 @@ public class UnitychanMove : MonoBehaviour
             ChangeGesture(InteractionGesture.Idle);
         }
     }
->>>>>>> Stashed changes
 }
