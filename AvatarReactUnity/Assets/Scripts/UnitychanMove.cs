@@ -38,8 +38,8 @@ public class UnitychanMove : MonoBehaviour
 
     [SerializeField]
     private GameObject anotherObj;
-    UnitychanMove anotherScript;
-    bool calledObject = false;
+    KaguyaMove anotherScript;
+    public bool calledObject = false;
 
     // ------------for State and Logic Control of Interactions------------
     public enum InteractionState
@@ -73,8 +73,7 @@ public class UnitychanMove : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
-        anotherScript = anotherObj.GetComponent<UnitychanMove>();
-        if (this.gameObject.name == "unitychan") calledObject = true;
+        anotherScript = anotherObj.GetComponent<KaguyaMove>();
         this.gameObject.transform.position = startPoint;
         this.gameObject.transform.rotation = Quaternion.Euler(startAngle.x, startAngle.y, startAngle.z);
         animationName = message;
@@ -87,6 +86,8 @@ public class UnitychanMove : MonoBehaviour
             MovePositionController();
             AnimateUnityChan();
         }
+        else
+            message = animationName = "finished";
     }
 
     private void AnimateUnityChan()
@@ -98,6 +99,7 @@ public class UnitychanMove : MonoBehaviour
 
     private void MovePositionController()
     {
+        Debug.Log("gameObject: " + this.gameObject.name + "message: " + message);
         if (MovePositionControllerMessage != animationName && animationName != "finished")
             MovePositionControllerMessage = animationName;
         else

@@ -30,8 +30,7 @@ from model import PointHistoryClassifier
 from realsensecv import RealsenseCapture
 
 # Constant to define where the interaction border starts
-CONST_CLOSE_BORDER_INTERACT = 1.5
-CONST_FAR_BORDER_INTERACT = 2.5
+CONST_BORDER_INTERACT = 2.5
 
 CONST_WRIST_DETECTION_DEPTH = 1
 CONST_MAX_NUM_HANDS = 4
@@ -252,11 +251,11 @@ def main():
 
 
         # Depth acquisition #############################################################
-        #centerDepth = cap.depth_frame.get_distance(int(cap_width/2), int(cap_height/2))
+        centerDepth = cap.depth_frame.get_distance(int(cap_width/2), int(cap_height/2))
 
         # Draw circle at center and change to green/red if enter/exit the interaciton area
         # And notify Unity that State has changed
-        #debug_image, distance_message = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
+        debug_image = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
 
 
         # Screen reflection #############################################################
@@ -625,15 +624,14 @@ def draw_info(image, fps, mode, number):
 
 # ADDED draw center circle: red if out of interaction area, green if inside
 def state_center_circle(image, width, height, depth):
-    distance_message = ""
-    if 0 < depth <= CONST_FAR_BORDER_INTERACT:
+    if 0 < depth <= CONST_BORDER_INTERACT:
         cv.circle(image, (int(width/2), int(height/2)), 5, (0, 255, 0), 5)
         send_string("state:InteractionStart")
     else:
         cv.circle(image, (int(width/2), int(height/2)), 5, (0, 0, 255), 5)
         send_string("state:InteractionStop")
 
-    return (image, distance_message)
+    return image
 
 if __name__ == '__main__':
     main()
