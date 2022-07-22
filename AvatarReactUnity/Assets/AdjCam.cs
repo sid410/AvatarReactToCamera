@@ -22,13 +22,13 @@ public class AdjCam : MonoBehaviour
     void Start()
     {
         cam = transform.Find("Camera").gameObject;
-        //screen = transform.Find("CalibScreen").gameObject;
+        screen = transform.Find("CalibScreen").gameObject;
         TextureRender = transform.Find("TexRenderer").gameObject;
         monitor = MonitorSize * 2.54f / 100 * Mathf.Cos(Mathf.Atan2(9f,16f));
-        //screen.GetComponent<Transform>().localScale = new Vector3(monitor/10f, 1f, monitor * 9f / 16f / 10f);
+        screen.GetComponent<Transform>().localScale = new Vector3(monitor/10f, 1f, monitor * 9f / 16f / 10f);
         TextureRender.GetComponent<Transform>().localScale = new Vector3(monitor / 10f, 1f, monitor * 9f / 16f / 10f);
         PlayerDistance = (MonitorSize * 2.54f/100f * Mathf.Cos(Mathf.Atan2(9f, 16f)) / 2f)/Mathf.Tan(FOV*Mathf.PI/360f);
-        cam.GetComponent<Camera>().nearClipPlane = 0.01f;
+        cam.GetComponent<Camera>().nearClipPlane = PlayerDistance;
         cam.GetComponent<Camera>().fieldOfView = Camera.HorizontalToVerticalFieldOfView(FOV, 16f / 9f);
         cam.GetComponent<Transform>().localPosition = new Vector3(0.0f, 0.0f,-1f*PlayerDistance);
 
