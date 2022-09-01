@@ -30,10 +30,10 @@ from model import PointHistoryClassifier
 from realsensecv import RealsenseCapture
 
 # Constant to define where the interaction border starts
-CONST_BORDER_INTERACT = 2.5
+CONST_BORDER_INTERACT = 1.6
 
 CONST_WRIST_DETECTION_DEPTH = 1
-CONST_MAX_NUM_HANDS = 4
+CONST_MAX_NUM_HANDS = 1
 CONST_HANDEDNESS_TO_TRACK = "Right"
 
 
@@ -61,7 +61,7 @@ def get_args():
     parser.add_argument("--min_detection_confidence",
                         help='min_detection_confidence',
                         type=float,
-                        default=0.7)
+                        default=0.5)
     parser.add_argument("--min_tracking_confidence",
                         help='min_tracking_confidence',
                         type=int,
@@ -93,6 +93,7 @@ def main():
     cap.HEIGHT = cap_height
     cap.FPS = 30
     cap.start()
+    depth_area_counter = 0
 
     # Model load #############################################################
     mp_hands = mp.solutions.hands
@@ -250,12 +251,14 @@ def main():
         debug_image = draw_info(debug_image, fps, mode, number)
 
 
-        # Depth acquisition #############################################################
-        centerDepth = cap.depth_frame.get_distance(int(cap_width/2), int(cap_height/2))
+        # Draw play area, calculate depth of play area,
+        # And notify Unity that State has changed based on depth info
+        debug_image = draw_play_area(debug_image)
 
-        # Draw circle at center and change to green/red if enter/exit the interaciton area
-        # And notify Unity that State has changed
-        debug_image = state_center_circle(debug_image, cap_width, cap_height, centerDepth)
+        depth_area_counter += 1
+        if depth_area_counter == 50:
+            depth_play_area(cap)
+            depth_area_counter = 0
 
 
         # Screen reflection #############################################################
@@ -632,6 +635,27 @@ def state_center_circle(image, width, height, depth):
         send_string("state:InteractionStop")
 
     return image
+
+
+def draw_play_area(image):
+    cv.rectangle(image, (100, 100), (540, 480), (0, 0, 0), 1)
+    return image
+
+
+def depth_play_area(cap_stream):
+    depth_average = 0
+    for x in range(100, 540):
+        for y in range(100, 480):
+            depth_average = depth_average + cap_stream.depth_frame.get_distance(x, y)
+
+    depth_average = depth_average/167200
+    
+    if 0 < depth_average <= CONST_BORDER_INTERACT:
+        send_string("state:InteractionStart")
+        print("InteractionStart")
+    else:
+        send_string("state:InteractionStop")
+        print("InteractionStop")
 
 if __name__ == '__main__':
     main()
