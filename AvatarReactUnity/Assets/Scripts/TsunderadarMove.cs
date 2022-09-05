@@ -4,12 +4,23 @@ using UnityEngine;
 
 public class TsunderadarMove : MonoBehaviour
 {
+    [SerializeField]
+    private float moveSpeed = 0.02f;
     public string message;
     public Vector3 startPoint;
     public Vector3 startAngle;
     public Vector3 DestinationPoint;
     public Vector3 interactionTargetPoint;
     public Vector3 stanbyPoint;
+
+    private Animator animator = null;
+    bool firstRotateGoDestination = false;
+    bool firstMoveGoDestination = false;
+    bool secondRotateGoDistination = false;
+    float rotateSpeed = 0.05f;
+    float DestinationDistance = 0.1f;
+    float previousAngle;
+    float startTime;
 
     enum TsundereState {
         Stanby,
@@ -26,13 +37,15 @@ public class TsunderadarMove : MonoBehaviour
         else if (state == TsundereState.SecondStep) state = TsundereState.Finish;
         else if (state == TsundereState.Finish) state = TsundereState.Stanby;
     }
-    string keyword = "Next";
-    bool isFinish;
+
+    string keyword;
+    string stateMessage;
+    public bool isFinish;
     bool isfirstCalFirstInteraction;
     bool isfirstCalSecondInteraction;
-    float firstStepTime = 6.0;
-    float secondStepTime = 8.0;
-    
+    float firstStepTime = 6.0f;
+    float secondStepTime = 8.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,6 +53,7 @@ public class TsunderadarMove : MonoBehaviour
         this.gameObject.transform.position = startPoint;
         this.gameObject.transform.rotation = Quaternion.Euler(startAngle.x, startAngle.y, startAngle.z);
         state = TsundereState.Stanby;
+        keyword = "state1";
         isFinish = true;
         isfirstCalFirstInteraction = true;
         isfirstCalSecondInteraction = true;
@@ -48,51 +62,69 @@ public class TsunderadarMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (message == keyword && isFinish)
+        stateMessage = GetComponent<RecAudio>().InputState;
+        if (isFinish && stateMessage == keyword)
         {
             nextState();
+            isFinish = false;
         }
 
-        if (state == TsundereState.Start) 
+        if (state == TsundereState.Start && !isFinish)
         {
-            if (goDestination(this.gameObject, DestinationPoint, interactionTargetPoint)) isFinish = false;
+            if (goDestination(this.gameObject, DestinationPoint, interactionTargetPoint))
+            {
+                message = "finished";
+                keyword = "state2";
+                isFinish = true;
+            }
             else isFinish = false;
         }
-        else if (state == TsundereState.FirstStep)
+        else if (state == TsundereState.FirstStep && !isFinish)
         {
-            if (firstInteraction()) isFinish = false;
-            else isFinish = true;
-        }
-        else if (state == TsundereState.SecondStep)
-        {
-            if (secondInteraction()) isFinish = false;
-            else isFinish = true;
-        }
-        else if (state == TsundereState.Finish)
-        {
-            if (goDestination(this.gameObject, startPoint, stanbyPoint)) isFinish = false;
-            else 
+            if (firstInteraction())
             {
-                isFinish = false;
+                message = "finished";
+                keyword = "state3";
+                isFinish = true;
+            }
+            else isFinish = false;
+        }
+        else if (state == TsundereState.SecondStep && !isFinish)
+        {
+            if (secondInteraction())
+            {
+                message = "finished";
+                keyword = "state4";
+                isFinish = true;
+            }
+            else isFinish = false;
+        }
+        else if (state == TsundereState.Finish && !isFinish)
+        {
+            if (goDestination(this.gameObject, startPoint, stanbyPoint))      
+            {
+                message = "finished";
+                keyword = "state1";
+                isFinish = true;
                 nextState();
             }
+            else isFinish = false;
         }
     }
 
     private bool goDestination(GameObject target, Vector3 to, Vector3 interactDirection)
     {
-        Debug.Log("firstRotateGoDestination : " + firstRotateGoDestination);
         if (firstRotateGoDestination || headDestination(target, to))
         {
             firstRotateGoDestination = true;
             if (firstMoveGoDestination || moveToDestination(target, to))
             {
                 firstMoveGoDestination = true;
-                if (seconRotateGoDistiantion || headDestination(target, interactDirection))
+                if (secondRotateGoDistination || headDestination(target, interactDirection))
                 {
                     firstRotateGoDestination = false;
                     firstMoveGoDestination = false;
-                    seconRotateGoDistiantion = false;
+                    secondRotateGoDistination = false;
                     animator.SetBool("isAutoWalk", false);
                     return true;
                 }

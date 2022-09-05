@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KaguyaMove : MonoBehaviour
+public class ManakaMove : MonoBehaviour
 {
     [SerializeField]
     private string message = "finished";
@@ -38,8 +38,8 @@ public class KaguyaMove : MonoBehaviour
 
     [SerializeField]
     private GameObject anotherObj;
-    ManakaMove anotherScript;
-    public bool calledObject = true;
+    KaguyaMove anotherScript;
+    public bool calledObject = false;
 
     public AudioClip Hi;
     public AudioClip MoeMoe;
@@ -80,7 +80,7 @@ public class KaguyaMove : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
-        anotherScript = anotherObj.GetComponent<ManakaMove>();
+        anotherScript = anotherObj.GetComponent<KaguyaMove>();
         this.gameObject.transform.position = startPoint;
         this.gameObject.transform.rotation = Quaternion.Euler(startAngle.x, startAngle.y, startAngle.z);
         animationName = message;
@@ -90,7 +90,7 @@ public class KaguyaMove : MonoBehaviour
     }
 
     void Update()
-    {
+    { 
         if (!anotherScript.calledObject)
         {
             calledObject = true;
@@ -99,9 +99,6 @@ public class KaguyaMove : MonoBehaviour
         }
         else
             message = animationName = "finished";
-/*        MovePositionController();
-        AnimateUnityChan();*/
-
     }
 
     private void AnimateUnityChan()
@@ -211,7 +208,7 @@ public class KaguyaMove : MonoBehaviour
         if (Time.time - startTime < interactionWaveTime && State == InteractionState.Start)
         {
             animator.SetBool("isAutoWave", true);
-            if(animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "WAIT03" && WaveStart == true)
+            if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "WAIT03" && WaveStart == true)
             {
                 CenterMonitor.GetComponent<AudioSource>().PlayOneShot(Hi);
                 WaveStart = false;
@@ -246,7 +243,6 @@ public class KaguyaMove : MonoBehaviour
             startTime = Time.time;
             firstCallInteractionMoe = false;
             
-            
         }
 
         // Changed so that it will interrupt gesture animation when person leave the interaction area
@@ -268,6 +264,7 @@ public class KaguyaMove : MonoBehaviour
             firstCallInteractionMoe = true;
             animator.SetBool("isAutoMoe", false);
             ChangeGesture(InteractionGesture.Idle);
+            
             
         }
     }
