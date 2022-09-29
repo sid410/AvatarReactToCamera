@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class TsunderadarMove : MonoBehaviour
 {
+
+    public AudioClip TunderRader1;
+    public AudioClip TunderRader2;
+    public AudioClip TunderRader3;
+    private AudioSource AudioSource;
+
     [SerializeField]
     private float moveSpeed = 0.02f;
     public string message;
@@ -28,6 +34,7 @@ public class TsunderadarMove : MonoBehaviour
         FirstStep,
         SecondStep,
         Finish,
+        Bye,
     };
     TsundereState state;
     void nextState() {
@@ -35,16 +42,21 @@ public class TsunderadarMove : MonoBehaviour
         else if (state == TsundereState.Start) state = TsundereState.FirstStep;
         else if (state == TsundereState.FirstStep) state = TsundereState.SecondStep;
         else if (state == TsundereState.SecondStep) state = TsundereState.Finish;
-        else if (state == TsundereState.Finish) state = TsundereState.Stanby;
+        else if (state == TsundereState.Finish) state = TsundereState.Bye;
+        else if (state == TsundereState.Bye) state = TsundereState.Stanby;
     }
 
     string keyword;
-    string stateMessage;
+    public string stateMessage;
     public bool isFinish;
     bool isfirstCalFirstInteraction;
     bool isfirstCalSecondInteraction;
+    bool isfirstCallGo;
+    bool isfirstCallByeInteraction;
     float firstStepTime = 6.0f;
     float secondStepTime = 8.0f;
+    float goStepTime = 1.0f;
+    float byeStepTime = 5.167f;
 
     // Start is called before the first frame update
     void Start()
@@ -57,12 +69,15 @@ public class TsunderadarMove : MonoBehaviour
         isFinish = true;
         isfirstCalFirstInteraction = true;
         isfirstCalSecondInteraction = true;
+        isfirstCallGo = true;
+        isfirstCallByeInteraction = true;
+        AudioSource = this.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        stateMessage = GetComponent<RecAudio>().InputState;
+        //stateMessage = GetComponent<RecAudio>().InputState;
         if (isFinish && stateMessage == keyword)
         {
             nextState();
@@ -101,7 +116,16 @@ public class TsunderadarMove : MonoBehaviour
         }
         else if (state == TsundereState.Finish && !isFinish)
         {
-            if (goDestination(this.gameObject, startPoint, stanbyPoint))      
+            if (byeInteraction())
+            {
+                message = "finished";
+                nextState();
+            }
+            else isFinish = false;
+        }
+        else if (state == TsundereState.Bye && !isFinish)
+        {
+            if (goDestination(this.gameObject, startPoint, stanbyPoint))
             {
                 message = "finished";
                 keyword = "state1";
@@ -114,6 +138,15 @@ public class TsunderadarMove : MonoBehaviour
 
     private bool goDestination(GameObject target, Vector3 to, Vector3 interactDirection)
     {
+        if (isfirstCallGo)
+        {
+            startTime = Time.time;
+            isfirstCallGo = false;
+            animator.SetBool("isAutoWalk", true);
+        }
+
+        if (Time.time - startTime < goStepTime) return false;
+
         if (firstRotateGoDestination || headDestination(target, to))
         {
             firstRotateGoDestination = true;
@@ -125,12 +158,12 @@ public class TsunderadarMove : MonoBehaviour
                     firstRotateGoDestination = false;
                     firstMoveGoDestination = false;
                     secondRotateGoDistination = false;
+                    isfirstCallGo = true;
                     animator.SetBool("isAutoWalk", false);
                     return true;
                 }
             }
         }
-        animator.SetBool("isAutoWalk", true);
         return false;
     }
 
@@ -171,6 +204,9 @@ public class TsunderadarMove : MonoBehaviour
         {
             startTime = Time.time;
             isfirstCalFirstInteraction = false;
+
+            AudioSource.clip = TunderRader1;
+            AudioSource.PlayOneShot(AudioSource.clip);
         }
 
         if (Time.time - startTime < firstStepTime)
@@ -191,6 +227,9 @@ public class TsunderadarMove : MonoBehaviour
         {
             startTime = Time.time;
             isfirstCalSecondInteraction = false;
+
+            AudioSource.clip = TunderRader2;
+            AudioSource.PlayOneShot(AudioSource.clip);
         }
 
         if (Time.time - startTime < secondStepTime)
@@ -202,6 +241,30 @@ public class TsunderadarMove : MonoBehaviour
         {
             isfirstCalSecondInteraction = true;
             animator.SetBool("isSecondStep", false);
+            return true;
+        }
+    }
+
+    private bool byeInteraction()
+    {
+        if (isfirstCallByeInteraction)
+        {
+            AudioSource.clip = TunderRader3;
+            AudioSource.PlayOneShot(AudioSource.clip);
+
+            startTime = Time.time;
+            isfirstCallByeInteraction = false;
+        }
+
+        if (Time.time - startTime < byeStepTime)
+        {
+            animator.SetBool("isByeStep", true);
+            return false;
+        }
+        else
+        {
+            animator.SetBool("isByeStep", false);
+            isfirstCallByeInteraction = true;
             return true;
         }
     }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 public class RecAudio : MonoBehaviour
 {
-    public GameObject Text;
+    public GameObject Kaguya;
     public bool InputOn;
     public bool KeywordOn;
     public bool Finish_Rec;
@@ -51,7 +51,7 @@ public class RecAudio : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        GetComponent<TsunderadarMove>().stateMessage = InputState;
 
     }
     private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
