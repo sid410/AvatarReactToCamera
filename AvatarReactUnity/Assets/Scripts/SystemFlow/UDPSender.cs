@@ -29,7 +29,7 @@ public class UDPSender : MonoBehaviour
         else if (State == "Cheki") { StateNumber = 4; }
         else if (State == "Finish") { StateNumber = 5; }
         else { }
-        Debug.Log(State);
+        // Debug.Log(State);
 
         byte[] dgram = Encoding.UTF8.GetBytes(StateNumber.ToString());
         client.Send(dgram, dgram.Length);
