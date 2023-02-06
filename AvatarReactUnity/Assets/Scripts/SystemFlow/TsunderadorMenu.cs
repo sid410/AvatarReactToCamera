@@ -35,7 +35,7 @@ public class TsunderadorMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (MotionTriger() && tsundereMode == "normal")
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
             animator.SetBool("isStartNormal", true);
@@ -44,7 +44,7 @@ public class TsunderadorMenu : MonoBehaviour
             sources[0].Play();
             isFinish = false;
         }
-        else if (MotionTriger() && tsundereMode == "normal")
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("WaitAnswer") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
             animator.SetBool("isConfirm", true);
@@ -62,8 +62,11 @@ public class TsunderadorMenu : MonoBehaviour
 
     bool MotionTriger()
     {
+        //if (Input.GetKey(KeyCode.Space)) return true;
+        //else return false;
+
         if (state.getState() == "Start" && inputMessage == "state1") return true;
-        else if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
+        if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
         else return false;
     }
 }

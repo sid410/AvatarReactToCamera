@@ -47,8 +47,7 @@ public class SoundRecognizer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GetComponent<TsunderadorMenu>().inputMessage = InputState;
-
+        Kaguya.GetComponent<TsunderadorMenu>().inputMessage = InputState;
     }
 
     private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
@@ -63,12 +62,14 @@ public class SoundRecognizer : MonoBehaviour
         {
             State++;
             InputState = "state" + State.ToString();
+            Debug.Log(InputState);
         }
         if (0 <= Array.IndexOf(m_Keywords_State2, args.text) && State == 1)
         {
             State++;
             InputState = "state" + State.ToString();
             State = 0;
+            Debug.Log(InputState);
         }
     }
 

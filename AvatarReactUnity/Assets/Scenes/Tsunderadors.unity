@@ -689,6 +689,7 @@ GameObject:
   - component: {fileID: 375836931}
   - component: {fileID: 375836930}
   - component: {fileID: 375836929}
+  - component: {fileID: 375836932}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -745,6 +746,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &375836932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375836928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b8482ae2e354a0438cef19b1f822dc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kaguya: {fileID: 934376766}
+  InputOn: 0
+  KeywordOn: 0
+  Finish_Rec: 0
+  InputState: State0
 --- !u!1 &520304815
 GameObject:
   m_ObjectHideFlags: 0
@@ -806,7 +824,7 @@ MonoBehaviour:
   m_text: "\u30B9\u30BF\u30F3\u30D0\u30A4\u4E2D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: cf6aa04b5a025ea4198cc918e62a20c2, type: 2}
-  m_sharedMaterial: {fileID: 8726179185559431404, guid: cf6aa04b5a025ea4198cc918e62a20c2, type: 2}
+  m_sharedMaterial: {fileID: -4016705754862930412, guid: cf6aa04b5a025ea4198cc918e62a20c2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
