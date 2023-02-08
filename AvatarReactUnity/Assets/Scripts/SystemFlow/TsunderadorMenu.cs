@@ -62,11 +62,11 @@ public class TsunderadorMenu : MonoBehaviour
 
     bool MotionTriger()
     {
-        //if (Input.GetKey(KeyCode.Space)) return true;
-        //else return false;
-
-        if (state.getState() == "Start" && inputMessage == "state1") return true;
-        if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
+        if (Input.GetKey(KeyCode.Space)) return true;
         else return false;
+
+        //if (state.getState() == "Start" && inputMessage == "state1") return true;
+        //if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
+        //else return false;
     }
 }
