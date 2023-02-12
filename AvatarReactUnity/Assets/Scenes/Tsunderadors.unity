@@ -169,24 +169,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &226514485 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7352629517848275133, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &226514487
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 226514485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
 --- !u!1001 &330384301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -852,6 +834,7 @@ GameObject:
   - component: {fileID: 375836930}
   - component: {fileID: 375836929}
   - component: {fileID: 375836932}
+  - component: {fileID: 375836933}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -925,18 +908,13 @@ MonoBehaviour:
   KeywordOn: 0
   Finish_Rec: 0
   InputState: State0
---- !u!1 &487132273 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -3901768450333093322, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &487132275
+--- !u!114 &375836933
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487132273}
+  m_GameObject: {fileID: 375836928}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
@@ -978,7 +956,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 270}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -367.5, y: 0}
+  m_AnchoredPosition: {x: -325, y: 0}
   m_SizeDelta: {x: 250, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &520304817
@@ -1003,15 +981,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30B9\u30BF\u30F3\u30D0\u30A4\u4E2D"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 98dddc9932c498043af3c098d5d7cc20, type: 2}
-  m_sharedMaterial: {fileID: 8726179185559431404, guid: 98dddc9932c498043af3c098d5d7cc20, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: cf6aa04b5a025ea4198cc918e62a20c2, type: 2}
+  m_sharedMaterial: {fileID: 8726179185559431404, guid: cf6aa04b5a025ea4198cc918e62a20c2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1154,42 +1132,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 736968835}
   m_CullTransparentMesh: 1
---- !u!1 &774238023 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7924292579018084111, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &774238025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 774238023}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &800775981 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 943754930701301157, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &800775983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800775981}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
 --- !u!1 &934376766 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1293547159042272644, guid: 53a872c5e2f4145a7b3ce4782b8fdb9d, type: 3}
@@ -1403,42 +1345,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!1 &974894056 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8392904668862894236, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &974894058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 974894056}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &977200121 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -1178603498212544504, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &977200123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 977200121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
 --- !u!1 &1080448652
 GameObject:
   m_ObjectHideFlags: 0
@@ -1542,132 +1448,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1091008455 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5809529308331278686, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1091008457
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1091008455}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &1140676654 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6518008791998089933, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1140676656
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1140676654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &1430756425 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2325928372949143096, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1430756427
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1430756425}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &1475954048 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7424729408899508183, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1475954052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1475954048}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &1695533968 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -1642425106323488877, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1695533970
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1695533968}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &1713451671 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7904029833681956370, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1713451673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1713451671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
---- !u!1 &1720726400 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -816902115514757144, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1720726402
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1720726400}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
 --- !u!1001 &1753928594
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1897,24 +1677,6 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 6688f1db5f49419449f5b33eed3ca536, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53a872c5e2f4145a7b3ce4782b8fdb9d, type: 3}
---- !u!1 &1760595093 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6589636718436749396, guid: 769d1fc7261d94d48863e21c5e9ab731, type: 3}
-  m_PrefabInstance: {fileID: 330384301}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1760595095
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1760595093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3a4383c957df143b7b7df98ea8a5c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Kaguya: {fileID: 934376766}
 --- !u!1 &1799339325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1992,7 +1754,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1799339325}
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -2.45, y: 1.03, z: -11.66}
+  m_LocalPosition: {x: -2.45, y: 1.2, z: -10.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2034,8 +1796,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -250, y: 0}
-  m_SizeDelta: {x: 150, y: 350}
+  m_AnchoredPosition: {x: -225, y: 0}
+  m_SizeDelta: {x: 200, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1877334144
 MonoBehaviour:
@@ -2050,7 +1812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
