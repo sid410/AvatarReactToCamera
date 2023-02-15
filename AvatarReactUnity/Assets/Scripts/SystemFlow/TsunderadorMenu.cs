@@ -17,43 +17,45 @@ public class TsunderadorMenu : MonoBehaviour
 
     private Animator animator;
     private AudioSource[] sources;
+    private DialogueManager dialogueManager;
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        //udpSender = GameObject.Find("UDPSender");
-        //udpSenderScript = udpSender.GetComponent<UDPSender>();
-        //udpSenderScript.State = state.getState();
         inputMessage = "";
 
         state = new StateManager("Start");
         isFinish = true;
 
-        sources = gameObject.GetComponents<AudioSource>();
+        //sources = gameObject.GetComponents<AudioSource>();
+        dialogueManager = new DialogueManager(dialogue, gameObject.GetComponents<AudioSource>());
     }
 
     // Update is called once per frame
     void Update()
     {
+
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
             animator.SetBool("isStartNormal", true);
-            Debug.Log("ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから\n勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？");
-            dialogue.text = "ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから\n勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？";
-            sources[0].Play();
+            //Debug.Log("ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから\n勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？");
+            //dialogue.text = "ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから\n勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？";
+            //sources[0].Play();
+            dialogueManager.activateAudio("Tsun");
             isFinish = false;
         }
         else if (animator.GetCurrentAnimatorStateInfo(0).IsName("WaitAnswer") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
             animator.SetBool("isConfirm", true);
-            Debug.Log("なんではいとか言っちゃうのよ！はいとか言わずにずっと「かぐや」の側にいてね");
-            dialogue.text = "なんではいとか言っちゃうのよ！はいとか言わずにずっと「かぐや」の側にいてね";
-            sources[1].Play();
+            //Debug.Log("なんではいとか言っちゃうのよ！はいとか言わずにずっと「かぐや」の側にいてね");
+            //dialogue.text = "なんではいとか言っちゃうのよ！はいとか言わずにずっと「かぐや」の側にいてね";
+            //sources[1].Play();
+            dialogueManager.activateAudio("Dere");
             isFinish = false;
         }
-        else if (!sources[0].isPlaying)
+        else if (dialogueManager.checkState())
         {
             animator.SetBool("isStartNormal", false);
             isFinish = true;
@@ -69,5 +71,87 @@ public class TsunderadorMenu : MonoBehaviour
         //if (state.getState() == "Start" && inputMessage == "state1") return true;
         //if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
         //else return false;
+    }
+
+
+    private class DialogueManager
+    {
+        private enum DialogueState
+        {
+            Stanby,
+            TsunTsunFirst,
+            TsunTsunSecond,
+            DereDereFirst,
+            DereDereSecond,
+        };
+
+        TextMeshProUGUI dialogue;
+        AudioSource[] sources;
+        DialogueState state;
+
+        public DialogueManager(TextMeshProUGUI dialogue, AudioSource[] sources)
+        {
+            this.dialogue = dialogue;
+            this.sources = sources;
+            this.state = DialogueState.Stanby;
+        }
+
+        public void activateAudio(string mode)
+        {
+            if (mode == "Tsun")
+            {
+                this.state = DialogueState.TsunTsunFirst;
+                this.dialogue.text = "ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから";
+                Debug.Log("ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから");
+                this.sources[0].Play();
+            }
+            else if (mode == "Dere")
+            {
+                this.state = DialogueState.DereDereFirst;
+                this.dialogue.text = "なんではいとか言っちゃうのよ！";
+                Debug.Log("なんではいとか言っちゃうのよ！");
+                this.sources[2].Play();
+            }
+        }
+
+        public bool checkState()
+        {
+            if (this.state == DialogueState.Stanby) 
+                return false;
+            else if (this.state == DialogueState.TsunTsunFirst && !this.sources[0].isPlaying)
+            {
+                this.state = DialogueState.TsunTsunSecond;
+                this.dialogue.text = "勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？";
+                Debug.Log("勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？");
+                this.sources[1].Play();
+                return false;
+            }
+            else if (this.state == DialogueState.TsunTsunSecond && !this.sources[1].isPlaying)
+                return true;
+            else if (this.state == DialogueState.DereDereFirst && !this.sources[2].isPlaying)
+            {
+                this.state = DialogueState.DereDereSecond;
+                this.dialogue.text = "はいとか言わずにずっと「かぐや」の側にいてね";
+                Debug.Log("はいとか言わずにずっと「かぐや」の側にいてね");
+                this.sources[3].Play();
+                return false;
+            }
+            else if (this.state == DialogueState.DereDereSecond && !this.sources[3].isPlaying)
+            {
+                this.state = DialogueState.Stanby;
+                return false;
+            }
+            else return false;
+        }
+
+        public string getState()
+        {
+            if (this.state == DialogueState.Stanby) return "Stanby";
+            else if (this.state == DialogueState.TsunTsunFirst) return "TsunTsunFirst";
+            else if (this.state == DialogueState.TsunTsunSecond) return "TsunTsunSecond";
+            else if (this.state == DialogueState.DereDereFirst) return "DereDereFirst";
+            else if (this.state == DialogueState.DereDereSecond) return "DereDereSecond";
+            else return "cannot get state";
+        }
     }
 }
