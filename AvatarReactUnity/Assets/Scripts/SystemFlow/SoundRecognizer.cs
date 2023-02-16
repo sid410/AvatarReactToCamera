@@ -16,8 +16,8 @@ public class SoundRecognizer : MonoBehaviour
     private int State;
     private string[] m_Keywords;
 
-    private string[] m_Keywords_State1 = new string[] {"ツンデレ", "レーダー"};
-    private string[] m_Keywords_State2 = new string[] {"はい"};
+    private string[] m_Keywords_State1 = new string[] {"お願いします", "オネガイシマス", "スタート", "ツンデレ", "レーダー"};
+    private string[] m_Keywords_State2 = new string[] {"はい","ハイ"};
 
 
 

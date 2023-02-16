@@ -34,14 +34,11 @@ public class TsunderadorMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        Debug.Log("dialogueManager State :" + dialogueManager.getState());
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
             animator.SetBool("isStartNormal", true);
-            //Debug.Log("ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから\n勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？");
-            //dialogue.text = "ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから\n勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？";
-            //sources[0].Play();
             dialogueManager.activateAudio("Tsun");
             isFinish = false;
         }
@@ -49,28 +46,31 @@ public class TsunderadorMenu : MonoBehaviour
         {
             state.nextState();
             animator.SetBool("isConfirm", true);
-            //Debug.Log("なんではいとか言っちゃうのよ！はいとか言わずにずっと「かぐや」の側にいてね");
-            //dialogue.text = "なんではいとか言っちゃうのよ！はいとか言わずにずっと「かぐや」の側にいてね";
-            //sources[1].Play();
             dialogueManager.activateAudio("Dere");
             isFinish = false;
         }
-        else if (dialogueManager.checkState())
+        else if (dialogueManager.checkState() == "WaitAnswer")
         {
             animator.SetBool("isStartNormal", false);
             isFinish = true;
+        }
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("NormalDereDere") && dialogueManager.getState() == "Stanby")
+        {
+            Debug.Log("Finish");
+            state.nextState();
+            animator.SetBool("isConfirm", false);
         }
     }
 
     bool MotionTriger()
     {
-        if (state.getState() == "Start" && Input.GetKey(KeyCode.LeftShift)) return true;
-        if (state.getState() == "TsunderadorFirst" && Input.GetKey(KeyCode.LeftControl)) return true;
-        else return false;
-
-        //if (state.getState() == "Start" && inputMessage == "state1") return true;
-        //if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
+        //if (state.getState() == "Start" && Input.GetKey(KeyCode.LeftShift)) return true;
+        //if (state.getState() == "TsunderadorFirst" && Input.GetKey(KeyCode.LeftControl)) return true;
         //else return false;
+
+        if (state.getState() == "Start" && inputMessage == "state1") return true;
+        if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
+        else return false;
     }
 
 
@@ -101,8 +101,8 @@ public class TsunderadorMenu : MonoBehaviour
             if (mode == "Tsun")
             {
                 this.state = DialogueState.TsunTsunFirst;
-                this.dialogue.text = "ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから";
-                Debug.Log("ちょっと！別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから");
+                this.dialogue.text = "ちょっと！\n別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから";
+                Debug.Log("ちょっと！\n別に「かぐや」が大好きなご主人様のために持ってきたわけだとか全然そんなんじゃないんだから");
                 this.sources[0].Play();
             }
             else if (mode == "Dere")
@@ -114,34 +114,36 @@ public class TsunderadorMenu : MonoBehaviour
             }
         }
 
-        public bool checkState()
+        public string checkState()
         {
             if (this.state == DialogueState.Stanby) 
-                return false;
+                return "Stanby";
             else if (this.state == DialogueState.TsunTsunFirst && !this.sources[0].isPlaying)
             {
                 this.state = DialogueState.TsunTsunSecond;
-                this.dialogue.text = "勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？";
-                Debug.Log("勘違いしないでこれ飲んだらとっとと帰ってよ！わかった？");
+                this.dialogue.text = "勘違いしないでこれ飲んだらとっとと帰ってよ！\nわかった？";
+                Debug.Log("勘違いしないでこれ飲んだらとっとと帰ってよ！\nわかった？");
                 this.sources[1].Play();
-                return false;
+                return "TsunTsunSecond";
             }
             else if (this.state == DialogueState.TsunTsunSecond && !this.sources[1].isPlaying)
-                return true;
+                return "WaitAnswer";
             else if (this.state == DialogueState.DereDereFirst && !this.sources[2].isPlaying)
             {
                 this.state = DialogueState.DereDereSecond;
                 this.dialogue.text = "はいとか言わずにずっと「かぐや」の側にいてね";
                 Debug.Log("はいとか言わずにずっと「かぐや」の側にいてね");
                 this.sources[3].Play();
-                return false;
+                return "DereDereSecond";
             }
             else if (this.state == DialogueState.DereDereSecond && !this.sources[3].isPlaying)
             {
                 this.state = DialogueState.Stanby;
-                return false;
+                this.dialogue.text = "ありがとうございました！";
+                Debug.Log("ありがとうございました！");
+                return "Finish";
             }
-            else return false;
+            else return "Error";
         }
 
         public string getState()

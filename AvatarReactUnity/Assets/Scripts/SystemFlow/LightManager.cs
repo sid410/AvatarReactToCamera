@@ -7,7 +7,8 @@ public class LightManager : MonoBehaviour
     public GameObject Kaguya;
 
     private Color lightColor;
-    private float colorValue;
+    private float greenValue;
+    private float blueValue;
     private string KaguyaState;
     private GameObject[] lightObjects;
 
@@ -34,9 +35,10 @@ public class LightManager : MonoBehaviour
         for (int i = 0; i < lightObjectName.Length; i++)
         {
             lightObjects[i] = GameObject.Find(lightObjectName[i]);
-            lightObjects[i].GetComponent<Light>().color = new Color(1.0f, 1.0f, 0.40f, 1.0f);
+            lightObjects[i].GetComponent<Light>().color = new Color(1.0f, 0.86f, 0.82f, 1.0f);
         }
-        colorValue = 0.0f;
+        greenValue = 0.0f;
+        blueValue = 0.0f;
     }
 
     // Update is called once per frame
@@ -44,11 +46,11 @@ public class LightManager : MonoBehaviour
     {
         KaguyaState = Kaguya.GetComponent<TsunderadorMenu>().state.getState();
 
-        if (KaguyaState == "TsunderadorSecond" && colorValue <= 0.60f)
+        if (KaguyaState == "TsunderadorSecond" && greenValue <= 0.14f)
         {
             for (int i=0; i < lightObjects.Length; i++)
-                lightObjects[i].GetComponent<Light>().color = new Color(1.0f, 1.0f - colorValue, 0.40f + colorValue);
-            colorValue += 0.001f;
+                lightObjects[i].GetComponent<Light>().color = new Color(1.0f, 1.0f - greenValue, 0.80f + greenValue);
+            greenValue += 0.001f;
         }
     }
 }

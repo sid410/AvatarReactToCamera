@@ -3,7 +3,27 @@ guid: 769d1fc7261d94d48863e21c5e9ab731
 ModelImporter:
   serializedVersion: 21202
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Base_And_Pole
+    second: {fileID: 2100000, guid: 539946e8786eafd42bcfa40f71e12315, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Column_material
+    second: {fileID: 2100000, guid: c27ccd0bfea1b0f48a295cf3e6b8aa1a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Floor_material
+    second: {fileID: 2100000, guid: 1acb05cd7313ac54995c2af5c0e5692a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Wall_material
+    second: {fileID: 2100000, guid: ef31f99fc3c30ba4ea9e6819de708bba, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
