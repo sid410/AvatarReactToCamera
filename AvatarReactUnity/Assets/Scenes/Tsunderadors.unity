@@ -1085,6 +1085,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Kaguya: {fileID: 934376766}
+  startColor: {r: 1, g: 1, b: 1, a: 0}
+  endColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &495141723
 GameObject:
   m_ObjectHideFlags: 0
@@ -1145,8 +1147,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u304B\u3050\u3084"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
-  m_sharedMaterial: {fileID: -5861267949356756159, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1280,8 +1282,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30B9\u30BF\u30F3\u30D0\u30A4\u4E2D..."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
-  m_sharedMaterial: {fileID: -5861267949356756159, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

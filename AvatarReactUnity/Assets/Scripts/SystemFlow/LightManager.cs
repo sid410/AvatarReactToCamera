@@ -5,12 +5,14 @@ using UnityEngine;
 public class LightManager : MonoBehaviour
 {
     public GameObject Kaguya;
+    public Color startColor;
+    public Color endColor;
 
-    private Color lightColor;
-    private float greenValue;
-    private float blueValue;
+    
     private string KaguyaState;
     private GameObject[] lightObjects;
+    private float speed;
+    static float t = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -35,10 +37,11 @@ public class LightManager : MonoBehaviour
         for (int i = 0; i < lightObjectName.Length; i++)
         {
             lightObjects[i] = GameObject.Find(lightObjectName[i]);
-            lightObjects[i].GetComponent<Light>().color = new Color(1.0f, 0.86f, 0.82f, 1.0f);
+            lightObjects[i].GetComponent<Light>().color = startColor;
         }
-        greenValue = 0.0f;
-        blueValue = 0.0f;
+
+        speed = 0.1f;
+
     }
 
     // Update is called once per frame
@@ -46,11 +49,14 @@ public class LightManager : MonoBehaviour
     {
         KaguyaState = Kaguya.GetComponent<TsunderadorMenu>().state.getState();
 
-        if (KaguyaState == "TsunderadorSecond" && greenValue <= 0.14f)
+        if (KaguyaState == "TsunderadorSecond")
         {
-            for (int i=0; i < lightObjects.Length; i++)
-                lightObjects[i].GetComponent<Light>().color = new Color(1.0f, 1.0f - greenValue, 0.80f + greenValue);
-            greenValue += 0.001f;
+            float lightT = Mathf.Lerp(0.0f, 1.0f, t);
+            for (int i = 0; i < lightObjects.Length; i++)
+                lightObjects[i].GetComponent<Light>().color = Color.Lerp(startColor, endColor, lightT);
+            Debug.Log("time: " + lightT);
+            t += speed * Time.deltaTime;
         }
+
     }
 }
