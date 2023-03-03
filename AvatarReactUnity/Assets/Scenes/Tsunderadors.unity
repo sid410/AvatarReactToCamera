@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 183127830}
   - component: {fileID: 183127829}
+  - component: {fileID: 183127831}
   m_Layer: 0
   m_Name: UDPSender
   m_TagString: Untagged
@@ -147,7 +148,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 183127828}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d47180d52d547694e83187796ac5f578, type: 3}
   m_Name: 
@@ -169,6 +170,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &183127831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183127828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d874686570686849b255882d3889675, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Slider: {fileID: 0}
+  Connect: 0
+  Button: {fileID: 0}
+  SendMesseage: 
+  StateManager: {fileID: 934376766}
+  State0: {r: 1, g: 1, b: 1, a: 0}
+  State1: {r: 1, g: 0, b: 0, a: 0}
+  State2: {r: 0, g: 0.12460327, b: 1, a: 0}
+  State3: {r: 0.23358655, g: 1, b: 0, a: 0}
+  State4: {r: 1, g: 0, b: 0.9812064, a: 0}
+  State5: {r: 0, g: 0, b: 0, a: 0}
+  State: 0
+  Cube: {fileID: 0}
+  TimeOfChange: 1
 --- !u!1001 &330384301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1085,7 +1112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Kaguya: {fileID: 934376766}
-  startColor: {r: 1, g: 1, b: 1, a: 0}
+  startColor: {r: 1, g: 0.7194109, b: 0.5058824, a: 0}
   endColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &495141723
 GameObject:
@@ -1147,8 +1174,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u304B\u3050\u3084"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
+  m_sharedMaterial: {fileID: -5861267949356756159, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1282,8 +1309,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u30B9\u30BF\u30F3\u30D0\u30A4\u4E2D..."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
+  m_sharedMaterial: {fileID: -5861267949356756159, guid: 562a0c3bdb2b16d40a4b937c22d992e4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
