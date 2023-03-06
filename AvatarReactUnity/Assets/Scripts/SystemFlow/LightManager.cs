@@ -54,7 +54,7 @@ public class LightManager : MonoBehaviour
             float lightT = Mathf.Lerp(0.0f, 1.0f, t);
             for (int i = 0; i < lightObjects.Length; i++)
                 lightObjects[i].GetComponent<Light>().color = Color.Lerp(startColor, endColor, lightT);
-            Debug.Log("time: " + lightT);
+            //Debug.Log("time: " + lightT);
             t += speed * Time.deltaTime;
         }
 

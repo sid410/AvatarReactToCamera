@@ -11,6 +11,7 @@ public class TsunderadorMenu : MonoBehaviour
     public StateManager state;
     public string inputMessage;
     public bool isFinish;
+    public Vector3 stanbyPostion;
 
     GameObject udpSender;
     UDPSender udpSenderScript;
@@ -18,6 +19,7 @@ public class TsunderadorMenu : MonoBehaviour
     private Animator animator;
     private AudioSource[] sources;
     private DialogueManager dialogueManager;
+    private bool isReview;
 
     void Start()
     {
@@ -26,6 +28,7 @@ public class TsunderadorMenu : MonoBehaviour
 
         state = new StateManager("Start");
         isFinish = true;
+        isReview = false;
 
         //sources = gameObject.GetComponents<AudioSource>();
         dialogueManager = new DialogueManager(dialogue, gameObject.GetComponents<AudioSource>());
@@ -34,7 +37,7 @@ public class TsunderadorMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("dialogueManager State :" + dialogueManager.getState());
+        //Debug.Log("dialogueManager State :" + dialogueManager.getState());
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
@@ -56,10 +59,33 @@ public class TsunderadorMenu : MonoBehaviour
         }
         else if (animator.GetCurrentAnimatorStateInfo(0).IsName("NormalDereDere") && dialogueManager.getState() == "Stanby")
         {
-            Debug.Log("Finish");
             state.nextState();
             animator.SetBool("isConfirm", false);
         }
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") && !isReview)
+        {
+            Debug.Log("Wait for going to review");
+            isReview = true;
+            StartCoroutine(dialogueManager.StartReview(3.0f));
+        }
+        else if (dialogueManager.getState() == "WaitAnswer")
+        {
+            Debug.Log("Wait for answer");
+            StartCoroutine(dialogueManager.WaitFeedback(1.5f));
+        }
+        else if (!animator.GetCurrentAnimatorStateInfo(0).IsName("OutSide") && dialogueManager.getState() == "Finish")
+        {
+            state.nextState();
+            animator.SetBool("isMoved", true);
+        }
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("OutSide"))
+        {
+            Debug.Log("OutSide");
+            animator.SetBool("isMoved", false);
+            animator.SetBool("isOut", true);
+            this.gameObject.transform.position = stanbyPostion;
+        }
+
     }
 
     bool MotionTriger()
@@ -68,8 +94,8 @@ public class TsunderadorMenu : MonoBehaviour
         //if (state.getState() == "TsunderadorFirst" && Input.GetKey(KeyCode.LeftControl)) return true;
         //else return false;
 
-        if (state.getState() == "Start" && inputMessage == "state1") return true;
-        if (state.getState() == "TsunderadorFirst" && inputMessage == "state2") return true;
+        if (state.getState() == "Start" && (inputMessage == "state1" || Input.GetKey(KeyCode.LeftShift))) return true;
+        if (state.getState() == "TsunderadorFirst" && (inputMessage == "state2" || Input.GetKey(KeyCode.LeftControl))) return true;
         else return false;
     }
 
@@ -83,6 +109,10 @@ public class TsunderadorMenu : MonoBehaviour
             TsunTsunSecond,
             DereDereFirst,
             DereDereSecond,
+            AskThoughts,
+            WaitAnswer,
+            Response,
+            Finish,
         };
 
         TextMeshProUGUI dialogue;
@@ -112,6 +142,20 @@ public class TsunderadorMenu : MonoBehaviour
                 Debug.Log("なんではいとか言っちゃうのよ！");
                 this.sources[2].Play();
             }
+            else if (mode == "AfterTalk")
+            {
+                this.state = DialogueState.AskThoughts;
+                this.dialogue.text = "どうだった？上手にツンデレーダーできてた？";
+                Debug.Log("どうだった？上手にツンデレーダーできてた？");
+                this.sources[4].Play();
+            }
+            else if (mode == "Response")
+            {
+                this.state = DialogueState.Response;
+                this.dialogue.text = "あっそ！その程度なんてまだまだね！次はもっと楽しませてあげるんだから！";
+                Debug.Log("あっそ！その程度なんてまだまだね！次はもっと楽しませてあげるんだから！");
+                this.sources[5].Play();
+            }
         }
 
         public string checkState()
@@ -139,8 +183,20 @@ public class TsunderadorMenu : MonoBehaviour
             else if (this.state == DialogueState.DereDereSecond && !this.sources[3].isPlaying)
             {
                 this.state = DialogueState.Stanby;
+                return "FinishMenu";
+            }
+            else if (this.state == DialogueState.AskThoughts && !this.sources[4].isPlaying)
+            {
+                this.state = DialogueState.WaitAnswer;
+                activateMike();
+                Debug.Log("Stanby for the answer");
+                return "WaitAnswer";
+            }
+            else if (this.state == DialogueState.Response && !this.sources[5].isPlaying)
+            {
+                this.state = DialogueState.Finish;
                 this.dialogue.text = "ありがとうございました！";
-                Debug.Log("ありがとうございました！");
+                Debug.Log("ありがとうございました！" + this.getState());
                 return "Finish";
             }
             else return "Error";
@@ -153,7 +209,42 @@ public class TsunderadorMenu : MonoBehaviour
             else if (this.state == DialogueState.TsunTsunSecond) return "TsunTsunSecond";
             else if (this.state == DialogueState.DereDereFirst) return "DereDereFirst";
             else if (this.state == DialogueState.DereDereSecond) return "DereDereSecond";
+            else if (this.state == DialogueState.AskThoughts) return "AskThoughts";
+            else if (this.state == DialogueState.WaitAnswer) return "WaitAnswer";
+            else if (this.state == DialogueState.Response) return "Response";
+            else if (this.state == DialogueState.Finish) return "Finish";
             else return "cannot get state";
+        }
+
+        // 終了後レビュー開始前待ち用コルーチン
+        public IEnumerator StartReview(float delay_time)
+        {
+            yield return new WaitForSeconds(delay_time);
+
+            activateAudio("AfterTalk");
+        }
+
+        // 感想入力待ち用コルーチン
+        public IEnumerator WaitFeedback(float delay_time)
+        {
+            yield return new WaitForSeconds(delay_time);
+
+            deactivateMike();
+            activateAudio("Response");
+        }
+
+        private void activateMike()
+        {
+            // 起動時のみTrue
+            // それ以外はFalse
+            Debug.Log("Activate Mike");
+        }
+
+        private void deactivateMike()
+        {
+            // 終了時のみTrue
+            // それ以外はFalse
+            Debug.Log("Deactivate Mike");
         }
     }
 }
