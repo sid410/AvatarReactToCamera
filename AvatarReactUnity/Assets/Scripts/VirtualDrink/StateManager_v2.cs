@@ -7,6 +7,7 @@ enum State_v2
     Stanby,
     First,
     Second,
+    Review,
     Finish
 };
 
@@ -25,6 +26,9 @@ public class StateManager_v2
                 break;
             case "Second":
                 this.state = State_v2.Second;
+                break;
+            case "Review":
+                this.state = State_v2.Review;
                 break;
             case "Finish":
                 this.state = State_v2.Finish;
@@ -46,6 +50,9 @@ public class StateManager_v2
                 this.state = State_v2.Second;
                 break;
             case State_v2.Second:
+                this.state = State_v2.Review;
+                break;
+            case State_v2.Review:
                 this.state = State_v2.Finish;
                 break;
             case State_v2.Finish:
@@ -70,6 +77,9 @@ public class StateManager_v2
                 break;
             case State_v2.Second:
                 stateString = "Second";
+                break;
+            case State_v2.Review:
+                stateString = "Review";
                 break;
             case State_v2.Finish:
                 stateString = "Finish";

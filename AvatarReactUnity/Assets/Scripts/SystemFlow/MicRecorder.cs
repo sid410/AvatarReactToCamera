@@ -47,7 +47,9 @@ public class MicRecorder : MonoBehaviour
     {
         try
         {
-            var path = defaultPath ?? $"{Application.temporaryCachePath}/record/{DateTime.Now:MMddHHmmss}.wav";
+            //\var path = defaultPath ?? $"{Application.temporaryCachePath}/record/{DateTime.Now:MMddHHmmss}.wav";
+            var path = $"C:/Users/imd-lab/Desktop/2022TSUNDERE/VirtualCafe/AvatarReactUnity/Assets/Logs/{DateTime.Now:MMddHHmmss}.wav";
+            Debug.Log("Thoghts Path: " + path);
             _fileStream = new FileStream(path, FileMode.Create);
             const byte emptyByte = new byte();
             for (var count = 0; count < HeaderLength; count++)

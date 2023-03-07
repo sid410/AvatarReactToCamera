@@ -7,14 +7,15 @@ public class AutoBlinkVRM : MonoBehaviour
 {
 
     [SerializeField]
-    float blinkTime = 0.1f;
+    float blinkTime = 0.1f;//目を瞑っている時間
     [SerializeField]
-    float blinkInterval = 3.0f;
+    float blinkInterval = 1.0f;//瞬きと瞬きの間の時間
 
     bool blinkEnabled = true;
-    bool blinking = false;
+    bool blinking = false;//true: 瞬き中,false: 瞬きしていないとき
     BlendShapePreset currentFace;
     VRMBlendShapeProxy proxy;
+    float deltaTime;
 
     void Start()
     {
@@ -23,51 +24,66 @@ public class AutoBlinkVRM : MonoBehaviour
         //デフォルトの表情をセット
         currentFace = BlendShapePreset.Neutral;
         proxy.AccumulateValue(currentFace, 1);
+        Debug.Log("Test: Start");
+
+        deltaTime = 0.0f;
     }
 
-    void Update()
+
+    void FixedUpdate()
     {
-        StartCoroutine("AutoBlink");  //文字列で指定する必要あり
+        //AutoBlink
+        //ここから
+        if (blinking) {//瞬きしている
+            if (deltaTime > blinkTime)
+            {
+                deltaTime = 0.0f;
+                blinking = false;
+                //Debug.Log("She Blinked!");
+            }
+            else
+            {
+                proxy.AccumulateValue(BlendShapePreset.Blink, 1);
+            }
+        }
+        else//瞬きしていない
+        {
+            if (deltaTime > blinkInterval)
+            {
+                deltaTime = 0.0f;
+                blinking = true;
+                blinkInterval = Random.Range(2, 6);//2-5秒の間でランダムで瞬き
+            }
+            else
+            {
+                proxy.AccumulateValue(BlendShapePreset.Blink, 0);
+            }
+        }
+        deltaTime+= Time.deltaTime;
+        //ここまで
 
         proxy.Apply();
     }
-
-    public void ChangeFace(BlendShapePreset preset = BlendShapePreset.Neutral, bool blink = false)
+    private void AutoBlink()
     {
-        blinkEnabled = blink;
-
-        if (!blink)
-        {
-            StopCoroutine("AutoBlink"); //文字列で指定しないと止まらないので注意
-            blinking = false;
-            proxy.AccumulateValue(BlendShapePreset.Blink, 0);
-        }
-
-        proxy.AccumulateValue(currentFace, 0);  //今の表情を無効化する
-        proxy.AccumulateValue(preset, 1);    //新しい表情をセットする
-
-        currentFace = preset;
+        
     }
 
-    IEnumerator AutoBlink()
-    {
-        if (!blinkEnabled | blinking)
-        {
-            yield break;
-        }
+    //public void ChangeFace(BlendShapePreset preset = BlendShapePreset.Neutral, bool blink = false)
+    //{
+    //    blinkEnabled = blink;
 
-        blinking = true;
+    //    if (!blink)
+    //    {
+    //        StopCoroutine("AutoBlink"); //文字列で指定しないと止まらないので注意
+    //        blinking = false;
+    //        proxy.AccumulateValue(BlendShapePreset.Blink, 0);
+    //    }
 
-        proxy.AccumulateValue(BlendShapePreset.Blink, 0);
-        blinkInterval = Random.Range(3, 7);//3-6秒の間でランダムで瞬き
+    //    proxy.AccumulateValue(currentFace, 0);  //今の表情を無効化する
+    //    proxy.AccumulateValue(preset, 1);    //新しい表情をセットする
 
-        yield return new WaitForSeconds(blinkInterval);
-
-        proxy.AccumulateValue(BlendShapePreset.Blink, 1);
-
-        yield return new WaitForSeconds(blinkTime);
-
-        blinking = false;
-    }
+    //    currentFace = preset;
+    //}
 
 }

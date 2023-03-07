@@ -102,7 +102,7 @@ public class LEDSender : MonoBehaviour
 
     private void Update()
     {
-        StateString = StateManager.GetComponent<TsunderadorMenu>().state.getState();
+        StateString = StateManager.GetComponent<main>().state.getState();
         if (StateString == "Start") { State = 0; }
         else if (StateString == "TsunderadorFirst") { State = 1; }
         else if (StateString == "TsunderadorSecond") { State = 2; }
