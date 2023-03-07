@@ -100,7 +100,7 @@ public class TsunderadorMenu : MonoBehaviour
     }
 
 
-    private class DialogueManager
+    private class DialogueManager: MonoBehaviour
     {
         private enum DialogueState
         {
@@ -118,6 +118,7 @@ public class TsunderadorMenu : MonoBehaviour
         TextMeshProUGUI dialogue;
         AudioSource[] sources;
         DialogueState state;
+        [SerializeField] private MicRecorder _micRecorder;
 
         public DialogueManager(TextMeshProUGUI dialogue, AudioSource[] sources)
         {
@@ -235,16 +236,15 @@ public class TsunderadorMenu : MonoBehaviour
 
         private void activateMike()
         {
-            // 起動時のみTrue
-            // それ以外はFalse
+            _micRecorder.StartRecord();
             Debug.Log("Activate Mike");
         }
 
         private void deactivateMike()
         {
-            // 終了時のみTrue
-            // それ以外はFalse
-            Debug.Log("Deactivate Mike");
+            if (_micRecorder.IsRecording)
+                StartCoroutine(_micRecorder.StopRecord());
+                Debug.Log("Deactivate Mike");
         }
     }
 }
