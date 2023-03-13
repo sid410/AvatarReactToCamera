@@ -26,7 +26,7 @@ public class TsunderadorMenu : MonoBehaviour
         animator = GetComponent<Animator>();
         inputMessage = "";
 
-        state = new StateManager("Start");
+        state = new StateManager("Stanby");
         isFinish = true;
         isReview = false;
 
@@ -38,7 +38,13 @@ public class TsunderadorMenu : MonoBehaviour
     void Update()
     {
         //Debug.Log("dialogueManager State :" + dialogueManager.getState());
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger() && tsundereMode == "normal")
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Wait") && MotionTriger() && tsundereMode == "normal")
+        {
+            state.nextState();
+            animator.SetBool("isStart", true);
+            isFinish = false;
+        }
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Start") && MotionTriger() && tsundereMode == "normal")
         {
             state.nextState();
             animator.SetBool("isStartNormal", true);
@@ -83,6 +89,7 @@ public class TsunderadorMenu : MonoBehaviour
             Debug.Log("OutSide");
             animator.SetBool("isMoved", false);
             animator.SetBool("isOut", true);
+            animator.SetBool("isStart", false);
             this.gameObject.transform.position = stanbyPostion;
         }
 
@@ -90,10 +97,7 @@ public class TsunderadorMenu : MonoBehaviour
 
     bool MotionTriger()
     {
-        //if (state.getState() == "Start" && Input.GetKey(KeyCode.LeftShift)) return true;
-        //if (state.getState() == "TsunderadorFirst" && Input.GetKey(KeyCode.LeftControl)) return true;
-        //else return false;
-
+        if (state.getState() == "Stanby" && (inputMessage == "stanby" || Input.GetKey(KeyCode.S))) return true;
         if (state.getState() == "Start" && (inputMessage == "state1" || Input.GetKey(KeyCode.LeftShift))) return true;
         if (state.getState() == "TsunderadorFirst" && (inputMessage == "state2" || Input.GetKey(KeyCode.LeftControl))) return true;
         else return false;
