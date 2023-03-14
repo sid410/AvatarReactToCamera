@@ -223,6 +223,7 @@ GameObject:
   - component: {fileID: 166971597}
   - component: {fileID: 166971598}
   - component: {fileID: 166971599}
+  - component: {fileID: 166971600}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -443,15 +444,40 @@ MonoBehaviour:
   Button: {fileID: 0}
   SendMesseage: 
   StateManager: {fileID: 166971593}
-  State0: {r: 1, g: 1, b: 1, a: 0}
-  State1: {r: 1, g: 0, b: 0, a: 0}
-  State2: {r: 1, g: 0.8443396, b: 0.8443396, a: 0}
-  State3: {r: 0.33962262, g: 0.12655748, b: 0.27168313, a: 0}
-  State4: {r: 0.09040952, g: 1, b: 0, a: 0}
-  State5: {r: 0, g: 0, b: 0, a: 0}
+  State0: {r: 0, g: 0, b: 0, a: 0}
+  State1K: {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 0}
+  State2K: {r: 0.5471698, g: 0.25551796, b: 0.3614917, a: 0}
+  State3K: {r: 1, g: 0.44920295, b: 0, a: 0}
+  State4K: {r: 0.6784314, g: 0.43788922, b: 0.27058825, a: 0}
+  State5K: {r: 0.8207547, g: 0.16647384, b: 0.55656296, a: 0}
+  Separate: 0
+  State1M: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 0}
+  State2M: {r: 0, g: 0.31117582, b: 1, a: 0}
+  State3M: {r: 0.8018868, g: 0, b: 0.5655037, a: 0}
+  State4M: {r: 0.15686187, g: 0.16916382, b: 0.7075472, a: 0}
+  State5M: {r: 0.02055893, g: 0.1165906, b: 0.6226415, a: 0}
+  State6: {r: 0, g: 0, b: 0, a: 0}
+  State7: {r: 1, g: 0, b: 0, a: 0}
+  NowColor: {r: 0, g: 0, b: 0, a: 0}
+  Kaguya: {fileID: 934376766}
+  manaka: {fileID: 2064250900}
   State: 0
   Cube: {fileID: 0}
   TimeOfChange: 1
+--- !u!114 &166971600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 166971593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b3a0d63cee5204e864b35cce6b7e4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  main: {fileID: 0}
+  textMessage: []
 --- !u!4 &196277334 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8715892389215456441, guid: 3627b9ed9e8d0644ea1ab3c8b34e3325, type: 3}
@@ -2207,6 +2233,9 @@ MonoBehaviour:
   m_text: '*Space key: Change virtual agent
 
     *Enter key: Shake Camera
+
+    *N
+    key: Change virtual agent accorfing to questionnaire
 
     State:
 

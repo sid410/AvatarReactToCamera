@@ -39,9 +39,6 @@ public class main : MonoBehaviour
         isFinish = true;
         isReview = false;
         _micRecorder = (new GameObject("EventSystem")).AddComponent<MicRecorder>();
-
-        //sources = gameObject.GetComponents<AudioSource>();
-        Debug.Log(gameObject.GetComponent<AudioSource>());
         dialogueManager = new DialogueManager(dialogue, gameObject.GetComponent<AudioSource>());
         if (changeDialogue == null) changeDialogue = gameObject.GetComponent<ChangeDialogue>();
         if (checkText == null) checkText = GameObject.Find("Canvas/CheckText").GetComponent<TextMeshProUGUI>();
@@ -57,12 +54,30 @@ public class main : MonoBehaviour
         //AnimationState: Standby && mode: TSUNDERE
         checkText.text = "*Space key: Change virtual agent" + "\n"
             + "*Enter key: Shake Camera" + "\n"
+            + "*N key: Change virtual agent accorfing to questionnaire" + "\n"
             + "State: " + state.getState() + "\n"
             + "DialogueManager State: " + dialogueManager.getDialogueState() + "\n"
             + "Mode: " + mode + "\n";
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger())
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Wait") && MotionTriger())
         {
             state.nextState();
+            animator.SetBool("isStart", true);
+            isFinish = false;
+        }
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Wait") && isFinish)
+        {
+            state.ResetState();
+            dialogueManager.ResetDialogueState();
+            dialogueManager.DisplayDialogueStanbyText();
+            isReview = false;
+            isFinish = true;
+            animator.SetBool("isOut", false);
+            agent.transform.position = startPosition;
+        }
+        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && MotionTriger())
+        {
+            state.nextState();
+            animator.SetBool("isStart", false);
             animator.SetBool("isStartNormal", true);
             dialogueManager.activateAudio(this.state.getState(), mode);
             isFinish = false;
@@ -115,12 +130,16 @@ public class main : MonoBehaviour
             dialogueManager.ResetDialogueState();
             dialogueManager.DisplayDialogueStanbyText();
             isReview = false;
-            isFinish = true;
+            isFinish = false;
             animator.SetBool("isOut", false);
             agent.transform.position = startPosition;
         }
-
-        if (Input.GetKeyDown(KeyCode.Space)&& animator.GetCurrentAnimatorStateInfo(0).IsName("Stanby"))
+        if(Input.GetKey(KeyCode.N) && animator.GetCurrentAnimatorStateInfo(0).IsName("Wait"))
+        {
+            pythonProgram py = this.GetComponent<pythonProgram>();
+            py.ChangeBehaviourBasedOnQuestionnaire();
+        }
+        if (Input.GetKeyDown(KeyCode.Space)&& animator.GetCurrentAnimatorStateInfo(0).IsName("Wait"))
         {
             SetAgent();
         }
@@ -136,13 +155,14 @@ public class main : MonoBehaviour
         //if (state.getState() == "Start" && Input.GetKey(KeyCode.LeftShift)) return true;
         //if (state.getState() == "TsunderadorFirst" && Input.GetKey(KeyCode.LeftControl)) return true;
         //else return false;
-        if (state.getState() == "Stanby" && (inputMessage == "state1" || Input.GetKey(KeyCode.LeftShift))) return true;
+        if (state.getState() == "Stanby" && (inputMessage == "stanby" || Input.GetKey(KeyCode.S))) return true;
+        if (state.getState() == "Start" && (inputMessage == "state1" || Input.GetKey(KeyCode.LeftShift))) return true;
         if (state.getState() == "First" && (inputMessage == "state2" || Input.GetKey(KeyCode.LeftControl))) return true;
         else return false;
     }
 
     //AgentÇÃï\é¶ÇêÿÇËë÷Ç¶ÇÈä÷êî
-    private void SetAgent()
+    public void SetAgent()
     {
         int prevAgentNum = agentNum;
         switch (agentNum)

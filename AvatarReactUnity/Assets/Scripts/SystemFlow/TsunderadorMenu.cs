@@ -40,6 +40,7 @@ public class TsunderadorMenu : MonoBehaviour
         //Debug.Log("dialogueManager State :" + dialogueManager.getState());
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Wait") && MotionTriger() && tsundereMode == "normal")
         {
+            Debug.Log("Called wait");
             state.nextState();
             animator.SetBool("isStart", true);
             isFinish = false;

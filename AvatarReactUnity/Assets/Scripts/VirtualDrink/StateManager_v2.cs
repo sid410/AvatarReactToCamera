@@ -5,6 +5,7 @@ using UnityEngine;
 enum State_v2
 {
     Stanby,
+    Start,
     First,
     Second,
     Review,
@@ -20,6 +21,9 @@ public class StateManager_v2
         {
             case "Stanby":
                 this.state = State_v2.Stanby;
+                break;
+            case "Start":
+                this.state = State_v2.Start;
                 break;
             case "First":
                 this.state = State_v2.First;
@@ -44,6 +48,9 @@ public class StateManager_v2
         switch (this.state)
         {
             case State_v2.Stanby:
+                this.state = State_v2.Start;
+                break;
+            case State_v2.Start:
                 this.state = State_v2.First;
                 break;
             case State_v2.First:
@@ -71,6 +78,9 @@ public class StateManager_v2
         {
             case State_v2.Stanby:
                 stateString = "Stanby";
+                break;
+            case State_v2.Start:
+                stateString = "Start";
                 break;
             case State_v2.First:
                 stateString = "First";
