@@ -24,7 +24,7 @@ public class AutoBlinkVRM : MonoBehaviour
         //デフォルトの表情をセット
         currentFace = BlendShapePreset.Neutral;
         proxy.AccumulateValue(currentFace, 1);
-        Debug.Log("Test: Start");
+        //Debug.Log("Test: Start");
 
         deltaTime = 0.0f;
     }

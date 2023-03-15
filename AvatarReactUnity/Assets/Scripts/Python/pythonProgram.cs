@@ -44,21 +44,30 @@ public class pythonProgram : MonoBehaviour
             return true;
         });
         //以降はメインスレッドで実施
+        switch (qResult[6])
+        {
+            case "0"://チェキなし
+                main.cheki = false;
+                break;
+            case "1"://チェキあり
+                main.cheki = true;
+                break;
+            default:
+                break;
+        }
         switch (str)
         {
             case "deredere":
                 print("Manaka is selected!");
-                if (main.agentNum != 1)//not manaka
-                {
-                    main.SetAgent(); //change to manaka
-                }
+              
+                main.SetAgent(1); //change to manaka
+                
                 break;
             case "tsundere":
                 print("Kaguya is selected!");
-                if (main.agentNum != 0)//not kaguya
-                {
-                    main.SetAgent(); //change to kaguya
-                }
+
+                main.SetAgent(0); //change to kaguya
+
                 break;
             default:
                 print("Error: the output of 'code.py' is incorrect.");

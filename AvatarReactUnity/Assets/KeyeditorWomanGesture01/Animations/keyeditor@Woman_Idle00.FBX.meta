@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: cf957baa062fb474481dc3f4bf496d2b
 ModelImporter:
-  serializedVersion: 26
+  serializedVersion: 21202
   internalIDToNameTable:
   - first:
       1: 100000
@@ -335,7 +335,7 @@ ModelImporter:
     second: //RootNode
   externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -344,6 +344,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -365,7 +366,7 @@ ModelImporter:
       name: Woman_Idle00
       takeName: Take 001
       internalID: 0
-      firstFrame: 0
+      firstFrame: 1
       lastFrame: 60
       wrapMode: 0
       orientationOffsetY: 0
@@ -402,20 +403,27 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
     preserveHierarchy: 0
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
+    optimizeBones: 1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
@@ -428,7 +436,6 @@ ModelImporter:
     normalSmoothingSource: 0
   referencedClips: []
   importAnimation: 1
-  copyAvatar: 1
   humanDescription:
     serializedVersion: 3
     human:
@@ -982,8 +989,7 @@ ModelImporter:
     - name: KEW L Finger21
       parentName: KEW L Finger2
       position: {x: -0.036982115, y: 0, z: -0.0000000047683715}
-      rotation: {x: -0.000000014901167, y: 0.00000007453307, z: 0.000000058638665,
-        w: 1}
+      rotation: {x: -0.000000014901167, y: 0.00000007453307, z: 0.000000058638665, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: KEW L Finger22
       parentName: KEW L Finger21
@@ -998,14 +1004,12 @@ ModelImporter:
     - name: KEW L Finger31
       parentName: KEW L Finger3
       position: {x: -0.031541288, y: 0, z: 0}
-      rotation: {x: -0.000000022351744, y: -0.000000022371227, z: -0.000000041899114,
-        w: 1}
+      rotation: {x: -0.000000022351744, y: -0.000000022371227, z: -0.000000041899114, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: KEW L Finger32
       parentName: KEW L Finger31
       position: {x: -0.029376373, y: 0, z: 0}
-      rotation: {x: 0.000000037252907, y: -0.000000033500754, z: 0.00000005775758,
-        w: 1}
+      rotation: {x: 0.000000037252907, y: -0.000000033500754, z: 0.00000005775758, w: 1}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: KEW L Finger4
       parentName: KEW L Hand
@@ -1090,8 +1094,7 @@ ModelImporter:
     - name: KEW R Finger21
       parentName: KEW R Finger2
       position: {x: -0.036982115, y: 0, z: 0.0000000047683715}
-      rotation: {x: 0.000000014901167, y: -0.00000007453307, z: 0.000000058638665,
-        w: 1}
+      rotation: {x: 0.000000014901167, y: -0.00000007453307, z: 0.000000058638665, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: KEW R Finger22
       parentName: KEW R Finger21
@@ -1106,14 +1109,12 @@ ModelImporter:
     - name: KEW R Finger31
       parentName: KEW R Finger3
       position: {x: -0.031541288, y: 0, z: 0}
-      rotation: {x: 0.000000022351744, y: 0.000000022371227, z: -0.000000041899114,
-        w: 1}
+      rotation: {x: 0.000000022351744, y: 0.000000022371227, z: -0.000000041899114, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: KEW R Finger32
       parentName: KEW R Finger31
       position: {x: -0.029376373, y: 0, z: 0}
-      rotation: {x: -0.000000037252907, y: 0.000000033500754, z: 0.00000005775758,
-        w: 1}
+      rotation: {x: -0.000000037252907, y: 0.000000033500754, z: 0.00000005775758, w: 1}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: KEW R Finger4
       parentName: KEW R Hand
@@ -1123,8 +1124,7 @@ ModelImporter:
     - name: KEW R Finger41
       parentName: KEW R Finger4
       position: {x: -0.03599991, y: 0, z: 0}
-      rotation: {x: -0.0000000074502373, y: -0.000013876717, z: 0.000000024745216,
-        w: 1}
+      rotation: {x: -0.0000000074502373, y: -0.000013876717, z: 0.000000024745216, w: 1}
       scale: {x: 1.0000001, y: 1, z: 1}
     - name: KEW R Finger42
       parentName: KEW R Finger41
@@ -1143,10 +1143,12 @@ ModelImporter:
     hasTranslationDoF: 1
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 953dc0bbeca19c942b3d051ec7d67227,
-    type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 953dc0bbeca19c942b3d051ec7d67227, type: 3}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3
   humanoidOversampling: 1
+  avatarSetup: 2
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
   additionalBone: 0
   userData: 
   assetBundleName: 

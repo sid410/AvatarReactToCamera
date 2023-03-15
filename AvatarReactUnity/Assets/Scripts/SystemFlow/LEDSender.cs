@@ -119,7 +119,7 @@ public class LEDSender : MonoBehaviour
 
     private void Update()
     {
-        StateString = StateManager.GetComponent<main>().state.getState();
+        //StateString = StateManager.GetComponent<main>().state.getState();
         if (StateString == "Stanby") { State = 0; }
         else if (StateString == "Start") { State = 1; }
         else if (StateString == "First") { State = 2; }
