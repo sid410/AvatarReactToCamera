@@ -20,12 +20,13 @@ public class main : MonoBehaviour
     private ChangeDialogue changeDialogue;//change color and agent-name text in dialogue
     public string inputMessage;//音声入力SoundRecognizer_v2で出力されるメッセージ//state1 or state2
 
-    public Vector3 posStanby;
-    public Vector3 rotStanby;
+    public Vector3 posWait, posStanby, posFirst;
+    public Vector3 rotWait, rotStanby, rotFirst;
+    private bool agentState; //agentの位置姿勢変更に使用（trueの時に変更、falseで無視）
 
     void Start()
     {
-        if (agents == null) agents = GameObject.Find("Agent");
+        if (agents == null) agents = GameObject.Find("Agents");
         if (changeDialogue == null) changeDialogue = gameObject.GetComponent<ChangeDialogue>();
         if (audioSource == null) audioSource = gameObject.GetComponent<AudioSource>();
         if (agentNum == 0)
@@ -39,6 +40,8 @@ public class main : MonoBehaviour
             changeDialogue.SetDialogue(agentNum);//change color and agent-name text in dialogue
         }
         agent = agents.transform.GetChild(agentNum).gameObject;
+        agent.transform.localPosition = posWait;
+        agent.transform.localRotation = Quaternion.Euler(rotWait);
         agentAnimator = agent.GetComponent<Animator>();
         agentAnimator.SetBool("mainBool", false);
         agentAnimator.SetBool("cheki", cheki);
@@ -78,6 +81,7 @@ public class main : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Debug.Log("agentPos: " + agent.transform.localPosition + ", agentRot: " + agent.transform.localRotation.eulerAngles);
         if (Input.GetKey(KeyCode.N) && agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Wait"))//キャラクターの振る舞いスタート：N
         {
             agentAnimator.SetBool("mainBool",true);
@@ -101,22 +105,43 @@ public class main : MonoBehaviour
         {
             agentAnimator.SetBool("mainBool", true);
         }
-        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("WaitAnswer") && Input.GetKey(KeyCode.T))//手動でユーザからの音声入力を設定：I
+        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("WaitAnswer") && Input.GetKey(KeyCode.T))//手動でユーザからの音声入力を設定：T
         {
             agentAnimator.SetBool("mainBool", true);
             Debug.Log("Ket T is clecked.");
         }
+       
 
-        
+
+        //エージェントの位置姿勢設定
+        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Wait") && agentState)//State: Wait開始時にの位置姿勢変更
+        {
+            agent.transform.localPosition = posWait;
+            agent.transform.localRotation = Quaternion.Euler(rotWait);
+            agentState = false;
+        }
+        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && agentState)//State: Stanby開始時にの位置姿勢変更
+        {
+            agent.transform.localPosition = posStanby;
+            agent.transform.localRotation = Quaternion.Euler(rotStanby);
+            agentState = false;
+        }
+        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("First") && agentState)//State: First開始時にの位置姿勢変更
+        {
+            agent.transform.localPosition = posFirst;
+            agent.transform.localRotation = Quaternion.Euler(rotFirst);
+            agentState = false;
+        }
 
     }
 
-    //Animation Stateが遷移したときに実行される関数
+    //Animation Stateが遷移したときに実行される関数（なぜかこの関数の中ではagentの位置姿勢の変更ができない。。。代わりにupdate関数内で変更）
     public void SetAnimationState(string animationState)
     {
         switch (animationState)
         {
             case "Wait":
+                agentState = true;
                 agentAnimator.SetBool("mainBool", false);
                 dialogue.text = "スタンバイ中...";
                 Debug.Log("State: Wait");
@@ -126,13 +151,13 @@ public class main : MonoBehaviour
                 Debug.Log("State: Move");
                 break;
             case "Stanby":
-                agent.transform.position = posStanby;
-                agent.transform.eulerAngles = rotStanby;
+                agentState = true;
                 agentAnimator.SetBool("mainBool", false);
                 Debug.Log("State: Stanby");
                 playAudio(0);
                 break;
             case "First":
+                agentState = true;
                 agentAnimator.SetBool("mainBool", false);
                 Debug.Log("State: First");
                 StartCoroutine(ContinuousPlay(1));
@@ -140,7 +165,7 @@ public class main : MonoBehaviour
             case "WaitAnswer":
                 agentAnimator.SetBool("mainBool", false);
                 Debug.Log("State: WaitAnswer");
-                agentAnimator.SetBool("cheki", cheki);//チェキの設定
+                agentAnimator.SetBool("cheki", cheki);//チェキの設定（チェキを撮るかどうか）
                 break;
             case "Second":
                 agentAnimator.SetBool("mainBool", false);
@@ -166,6 +191,7 @@ public class main : MonoBehaviour
                 break;
         }
     }
+    //エージェントを設定する関数（現状（3/15）：エージェントの種類＝ツンデレorデレデレ）
     public void SetAgent(int agentNUM)
     {
         agentNum = agentNUM;
@@ -182,7 +208,7 @@ public class main : MonoBehaviour
             default:
                 break;
         }
-        if (agents == null) agents = GameObject.Find("Agent");
+        if (agents == null) agents = GameObject.Find("Agents");
         agent = agents.transform.GetChild(agentNum).gameObject;
         agentAnimator = agent.GetComponent<Animator>();
 
@@ -235,7 +261,7 @@ public class main : MonoBehaviour
             default:
                 break;
         }
-        yield return new WaitForSecondsRealtime(audioSource.clip.length);
+        yield return new WaitForSecondsRealtime(audioSource.clip.length);//音声ファイルが再生されている時間待機
         switch (mode)
         {
             case "TSUNDERE":
@@ -251,7 +277,7 @@ public class main : MonoBehaviour
             default:
                 break;
         }
-        yield return new WaitForSecondsRealtime(audioSource.clip.length);
+        yield return new WaitForSecondsRealtime(audioSource.clip.length);//音声ファイルが再生されている時間待機
         agentAnimator.SetBool("mainBool", true);
         if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Second"))//ひとつ前でmainBoolをtrue->falseに変化しなかったので、triggerを代用
         {
