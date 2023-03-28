@@ -64,9 +64,24 @@ public class AutoBlinkVRM : MonoBehaviour
 
         proxy.Apply();
     }
-    private void AutoBlink()
+   
+    public void Angry()
     {
-        
+        proxy.AccumulateValue(BlendShapePreset.Fun, 0);
+        proxy.AccumulateValue(BlendShapePreset.Angry, 1);
+        proxy.Apply();
+    }
+    public void Smile()
+    {
+        proxy.AccumulateValue(BlendShapePreset.Angry, 0);
+        proxy.AccumulateValue(BlendShapePreset.Fun, 1);
+        proxy.Apply();
+    }
+    public void FaceReset()
+    {
+        proxy.AccumulateValue(BlendShapePreset.Angry, 0);
+        proxy.AccumulateValue(BlendShapePreset.Fun, 0);
+        proxy.Apply();
     }
 
     //public void ChangeFace(BlendShapePreset preset = BlendShapePreset.Neutral, bool blink = false)

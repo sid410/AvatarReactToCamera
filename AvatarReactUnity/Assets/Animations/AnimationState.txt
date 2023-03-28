@@ -1,0 +1,12 @@
+1. 00_Stanby:画面奥で待機中
+2. 01_Notice：ユーザに気づく
+3. 02_MoveFrameOut1：画面奥左にフレームアウト
+4. 03_MoveFrameIn1：画面手前左からフレームイン
+5. 04_Greeting1：最初の挨拶
+6. 05_Tsunderador1：ツンデレーダー前半
+7. 06_WaitingForResponse：ユーザからの応答待ち
+8. 07_Tsunderador2：ツンデレーダー後半
+9. 08_Greeting2：最後の挨拶
+ or 
+9. 08_Greeting2Ccocheki：CCOChekiへ誘導
+ブラックアウト→Stanby

@@ -17,7 +17,7 @@ public class SoundRecognizer_v2 : MonoBehaviour
     private string[] m_Keywords;
 
     private string[] m_Keywords_State1 = new string[] {"お願いします", "オネガイシマス", "スタート", "ツンデレ", "レーダー"};
-    private string[] m_Keywords_State2 = new string[] {"はい","ハイ"};
+    private string[] m_Keywords_State2 = new string[] {"はい","ハイ", "お願いします", "おねがいします", "オネガイシマス", "いいね", "イイネ", "いいよ", "イイヨ", "わかった", "分かった", "ワカッタ"};
 
 
 
@@ -48,7 +48,7 @@ public class SoundRecognizer_v2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        main.inputMessage = InputState;
+        
     }
 
     private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
@@ -57,21 +57,35 @@ public class SoundRecognizer_v2 : MonoBehaviour
         builder.AppendFormat("{0} ({1}){2}", args.text, args.confidence, Environment.NewLine);
         builder.AppendFormat("\tTimestamp: {0}{1}", args.phraseStartTime, Environment.NewLine);
         builder.AppendFormat("\tDuration: {0} seconds{1}", args.phraseDuration.TotalSeconds, Environment.NewLine);
-        Debug.Log(builder.ToString());
+        //Debug.Log(builder.ToString());
 
-        if (0 <= Array.IndexOf(m_Keywords_State1, args.text) && State == 0)
+        //if (0 <= Array.IndexOf(m_Keywords_State1, args.text) && State == 0)
+        //{
+        //    State++;
+        //    InputState = "state" + State.ToString();
+        //    Debug.Log(InputState);
+        //}
+        //if (0 <= Array.IndexOf(m_Keywords_State2, args.text) && State == 1)
+        //{
+        //    InputState = "state" + State.ToString();
+        //    State = 0;
+        //    Debug.Log(InputState);
+        //}
+        if (0 <= Array.IndexOf(m_Keywords_State2, args.text) && main.agentAnimator[main.agentNum].GetCurrentAnimatorStateInfo(0).IsName("06_WaitingForResponseTD"))
         {
-            State++;
-            InputState = "state" + State.ToString();
-            Debug.Log(InputState);
+            InputState = "answer";
+            //Debug.Log("Got answer: " + args.text);
         }
-        if (0 <= Array.IndexOf(m_Keywords_State2, args.text) && State == 1)
+        else if (0 <= Array.IndexOf(m_Keywords_State2, args.text) && main.agentAnimator[main.agentNum].GetCurrentAnimatorStateInfo(0).IsName("06_WaitingForResponseOM"))
         {
-            State++;
-            InputState = "state" + State.ToString();
-            State = 0;
-            Debug.Log(InputState);
+            InputState = "answer";
+            //Debug.Log("Got answer!");
         }
+        else
+        {
+            InputState = "";
+        }
+        main.inputMessage = InputState;
     }
 
 }

@@ -10,41 +10,61 @@ public class StateMachineBehaviourSample : StateMachineBehaviour
     {
         if (main == null) main = GameObject.Find("Main").GetComponent<main>();
 
-        if (stateInfo.IsName("Wait"))//Waitに変更した時
+        if (stateInfo.IsName("00_Stanby"))//00_Stanbyに変更した時
         {
-            main.SetAnimationState("Wait");
+            main.SetAnimationState("00_Stanby");
         }
-        if (stateInfo.IsName("Move"))//Moveに変更した時
+        if (stateInfo.IsName("01_Notice"))//01_Noticeに変更した時
         {
-            main.SetAnimationState("Move");
+            main.SetAnimationState("01_Notice");
         }
-        if (stateInfo.IsName("Stanby"))//Stanbyに変更した時
+        if (stateInfo.IsName("02_MoveFrameOut1"))//02_MoveFrameOut1に変更した時
         {
-            main.SetAnimationState("Stanby");
+            main.SetAnimationState("02_MoveFrameOut1");
         }
-        if (stateInfo.IsName("First"))//Firstに変更した時
+        if (stateInfo.IsName("03_MoveFrameIn1"))//03_MoveFrameIn1に変更した時
         {
-            main.SetAnimationState("First");
+            main.SetAnimationState("03_MoveFrameIn1");
         }
-        if (stateInfo.IsName("WaitAnswer"))//WaitAnswerに変更した時
+        if (stateInfo.IsName("04_Greeting1"))//04_Greeting1に変更した時
         {
-            main.SetAnimationState("WaitAnswer");
+            main.SetAnimationState("04_Greeting1");
         }
-        if (stateInfo.IsName("Second"))//Secondに変更した時
+        if (stateInfo.IsName("05_Tsunderador1"))//05_Tsunderador1に変更した時
         {
-            main.SetAnimationState("Second");
+            main.SetAnimationState("05_Tsunderador1");
         }
-        if (stateInfo.IsName("Bye"))//Byeに変更した時
+        if (stateInfo.IsName("05_Omakase1"))//05_Omakase1に変更した時
         {
-            main.SetAnimationState("Bye");
+            main.SetAnimationState("05_Omakase1");
         }
-        if (stateInfo.IsName("ByeCheki"))//ByeChekiに変更した時
+        if (stateInfo.IsName("06_WaitingForResponseTD"))//06_WaitingForResponseTDに変更した時
         {
-            main.SetAnimationState("ByeCheki");
+            main.SetAnimationState("06_WaitingForResponseTD");
         }
-        if (stateInfo.IsName("Back"))//Backに変更した時
+        if (stateInfo.IsName("06_WaitingForResponseOM"))//06_WaitingForResponseOMに変更した時
         {
-            main.SetAnimationState("Back");
+            main.SetAnimationState("06_WaitingForResponseOM");
+        }
+        if (stateInfo.IsName("07_Tsunderador2"))//07_Tsunderador2に変更した時
+        {
+            main.SetAnimationState("07_Tsunderador2");
+        }
+        if (stateInfo.IsName("idleAfterTD"))//bowに変更した時
+        {
+            main.SetAnimationState("idleAfterTD");
+        }
+        if (stateInfo.IsName("07_Omakase2"))//07_Omakase2に変更した時
+        {
+            main.SetAnimationState("07_Omakase2");
+        }
+        if (stateInfo.IsName("08_Greeting2"))//08_Greeting2に変更した時
+        {
+            main.SetAnimationState("08_Greeting2");
+        }
+        if (stateInfo.IsName("09_Greeting2CCOCheki"))//09_Greeting2CCOChekiに変更した時
+        {
+            main.SetAnimationState("09_Greeting2CCOCheki");
         }
     }
 

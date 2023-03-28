@@ -44,29 +44,53 @@ public class pythonProgram : MonoBehaviour
             return true;
         });
         //以降はメインスレッドで実施
-        switch (qResult[6])
+        switch (qResult[4])//Agent
         {
-            case "0"://チェキなし
-                main.cheki = false;
+            case "0"://Kaguya
+                main.SetAgent(0);
+                main.SetAgentVoice(0);
+                main.SetDialogue(0);
+                main.checkAgent.text = "Agent: Kaguya";
                 break;
-            case "1"://チェキあり
-                main.cheki = true;
+            case "1"://Manaka
+                main.SetAgent(1);
+                main.SetAgentVoice(1);
+                main.SetDialogue(1);
+                main.checkAgent.text = "Agent: Manaka";
                 break;
             default:
                 break;
         }
-        switch (str)
+       
+
+        switch (qResult[5])//Cheki
+        {
+            case "0"://チェキなし
+                main.cheki = false;
+                main.checkCheki.text = "Cheki: false";
+                break;
+            case "1"://チェキあり
+                main.cheki = true;
+                main.checkCheki.text = "Cheki: true";
+                break;
+            default:
+                break;
+        }
+
+        switch (str)//mode
         {
             case "deredere":
-                print("Manaka is selected!");
-              
-                main.SetAgent(1); //change to manaka
+                print("Mode: Omakase Soda");
+                main.mode = 1;
+                main.checkMode.text = "Mode: Omakase Soda";
+                main.agentAnimator[main.agentNum].SetBool("tsundere", false);
                 
                 break;
             case "tsundere":
-                print("Kaguya is selected!");
-
-                main.SetAgent(0); //change to kaguya
+                print("Mode: Tsunderador");
+                main.mode = 0;
+                main.checkMode.text = "Mode: Tsunderador";
+                main.agentAnimator[main.agentNum].SetBool("tsundere", true);
 
                 break;
             default:

@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.iam1337.extosc": {
+      "version": "https://github.com/iam1337/extOSC.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0"
+      },
+      "hash": "0052663e81144fab0868093cb6b4a6b9b075c24b"
+    },
     "com.unity.animation.rigging": {
       "version": "1.1.1",
       "depth": 0,

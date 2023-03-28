@@ -9,7 +9,7 @@ using System.Threading;
 
 public class LEDSender : MonoBehaviour
 {
-    public Slider Slider;
+    //public Slider Slider;
 
     private string a = "0";
     private string b = "0";
@@ -25,16 +25,17 @@ public class LEDSender : MonoBehaviour
     IPEndPoint SendeIPEND;
 
     public bool Connect;
-    public Button Button;
+    //public Button Button;
     public string SendMesseage;
-    public GameObject StateManager;
+    //public GameObject StateManager;
 
-    public Color State0;
-    public Color State1K;
-    public Color State2K;
-    public Color State3K;
-    public Color State4K;
-    public Color State5K;
+    /* K = Tsunderader M = Omakase
+    public Color State0;//Stanby
+    public Color State1K;//Start
+    public Color State2K;//TD1
+    public Color State3K;//TD2
+    public Color State4K;//Review
+    public Color State5K;//Finish
     public bool Separate;
     public Color State1M;
     public Color State2M;
@@ -48,22 +49,44 @@ public class LEDSender : MonoBehaviour
     private Color State2;
     private Color State3;
     private Color State4;
-    private Color State5;
+    private Color State5;*/
+
+    public Color Waiting;
+    
 
     public Color NowColor;
     private Color PrevColor;
 
-    public GameObject Kaguya;
-    public GameObject manaka;
+    public bool MaintananceMode;
+    public Color ForMaintanance;
 
-    public int State;
+    //public GameObject Kaguya;
+    //public GameObject manaka;
+
+    [SerializeField, Range(0, 100)]
+    public int Volume;
+
+    [SerializeField, Range(0.01f, 10.0f)]
+    public float CTime;
+
+    private int State;
 
     private int PrevState;
 
-    public GameObject Cube;
-    private float ChangeColor;
+    private GameObject Cube;
+    private float ChangeColorTime;
     public float TimeOfChange;
+    public float LoopTime;
     private string StateString;
+    private bool Recieve;
+
+    private bool UntilChangeColor;
+
+    public bool StartChangeColor;
+    const float FIXED_UPDATE_DELTATIME = 0.02f;
+
+    public float BackColorTime;
+
 
 
     private void Start()
@@ -89,16 +112,33 @@ public class LEDSender : MonoBehaviour
     {
         while (true)
         {
+            Recieve = true;
             IPEndPoint senderEP = null;
-            byte[] receivedBytes = udpClient.Receive(ref senderEP);
-            Parse(senderEP, receivedBytes);
+            try
+            {
+                byte[] receivedBytes = udpClient.Receive(ref senderEP);
+                Parse(senderEP, receivedBytes);
+            }
+            catch (SocketException)
+            {
+                break;
+            }
+            
+            
         }
+        Recieve = false;
+        
+    }
+    public void daipan()
+    {
+        StartCoroutine(SoundPlay());
     }
 
     IEnumerator SoundPlay()
     {
-        yield return new WaitForSeconds(2);
+        
         b = "1";
+        yield return new WaitForSeconds(0.7f);
     }
 
     void Parse(IPEndPoint senderEP, byte[] message)
@@ -119,34 +159,77 @@ public class LEDSender : MonoBehaviour
 
     private void Update()
     {
-        //StateString = StateManager.GetComponent<main>().state.getState();
-        if (StateString == "Stanby") { State = 0; }
-        else if (StateString == "Start") { State = 1; }
-        else if (StateString == "First") { State = 2; }
-        else if (StateString == "Second") { State = 3; }
-        else if (StateString == "Review") { State = 4; }
-        else if (StateString == "Finish") { State = 5; }
-        else if (StateString == "Error") { State = 6; }
-        else { State = 7; }
+        if (!Recieve)
+        {
+            receiveThread.Abort();
+            receiveThread = new Thread(new ThreadStart(ThreadReceive)); 
+            receiveThread.Start(); 
+        }
 
-        if (Kaguya.activeSelf)
-        {
-            State1 = State1K;
-            State2 = State2K;
-            State3 = State3K;
-            State4 = State4K;
-            State5 = State5K;
-        }
-        else if (manaka.activeSelf)
-        {
-            State1 = State1M;
-            State2 = State2M;
-            State3 = State3M;
-            State4 = State4M;
-            State5 = State5M;
-        }
+
+        StateString =this.GetComponent<main>().CurrentState;
+        if (StateString == "00_Stanby") { State = 14; }
+        else if (StateString == "01_Notice") { State = 0; }
+        else if (StateString == "02_MoveFrameOut1") { State = 1; }
+        else if (StateString == "03_MoveFrameIn1") { State = 2; }
+        else if (StateString == "04_Greeting1") { State = 3; }
+        else if (StateString == "05_Tsunderador1") { State = 4; }
+        else if (StateString == "05_Omakase1") { State = 5; }
+        else if (StateString == "06_WaitingForResponseTD") { State = 6; }
+        else if (StateString == "06_WaitingForResponseOM") { State = 7; }
+        else if (StateString == "07_Tsunderador2") { State = 8; }
+        else if (StateString == "07_Omakase2") { State = 9; }
+        else if (StateString == "idleAfterTD") { State = 10; }
+        else if (StateString == "08_Greeting2") { State = 11; }
+        else if (StateString == "09_Greeting2CCOCheki") { State = 12; }
+
+        else State=13;
+
+        
+        Debug.Log("LEDSender: " + State);
+
 
         switch (State)
+        {
+            case 0:
+                if (State == PrevState)
+                {
+                    ChangeColorTime += Time.deltaTime / TimeOfChange;
+                    if (ChangeColorTime >= 1)
+                    {
+                        ChangeColorTime = 1;
+                    }
+                    //Debug.Log("Time delta: " + NowColor);
+                    NowColor = Color.Lerp(PrevColor, Waiting, ChangeColorTime);
+
+                }
+                else
+                {
+                    PrevColor = NowColor;
+                    PrevState = State;
+                    ChangeColorTime = 0;
+
+                }
+                break;
+
+            case 10:
+                if (State == PrevState)
+                {
+                    
+                }
+                else
+                {
+                    StartCoroutine(Yuragi());
+                }
+
+
+
+                break;
+        }
+
+        
+
+        /*switch (State)
         {
             case 0:
                 if(State == PrevState)
@@ -156,6 +239,7 @@ public class LEDSender : MonoBehaviour
                     {
                         ChangeColor = 1;
                     }
+                    Debug.Log("Time delta: " + NowColor);
                     NowColor = Color.Lerp(PrevColor, State0, ChangeColor);
 
                 }
@@ -303,14 +387,30 @@ public class LEDSender : MonoBehaviour
                     ChangeColor = 0;
                 }
                 break;
-        }
-        SendMesseage = NowColor.r.ToString() + "," + NowColor.g.ToString() + "," + NowColor.b.ToString() + "," + b;
+        }*/
+        //SendMesseage = NowColor.r.ToString() + "," + NowColor.g.ToString() + "," + NowColor.b.ToString() + "," + b;
 
         //Cube.GetComponent<Renderer>().material.color = NowColor;
-        if (Connect)
+        
+        if (StartChangeColor)
+        {
+            //StartCoroutine(Yuragi());
+            b = "1";
+            StartChangeColor = false;
+        }
+
+
+        if (Connect && !MaintananceMode) // Normal mode
         {
             //Color color = Color.HSVToRGB(float.Parse(a), 1, 1);
-            SendMesseage = NowColor.r.ToString() + "," + NowColor.g.ToString() + "," + NowColor.b.ToString() + "," + b;
+            SendMesseage = NowColor.r.ToString() + "," + NowColor.g.ToString() + "," + NowColor.b.ToString() + "," + b + "," + Volume.ToString() + "," + "1";
+            byte[] sendbyte = Encoding.UTF8.GetBytes(SendMesseage);
+            udpClient.Send(sendbyte, sendbyte.Length, SendeIPEND);
+            b = "0";
+        }
+        else if(Connect && MaintananceMode)//Maintanance Mode
+        {
+            SendMesseage = ForMaintanance.r.ToString() + "," + ForMaintanance.g.ToString() + "," + ForMaintanance.b.ToString() + "," + b + "," + Volume.ToString() + "," + "1";
             byte[] sendbyte = Encoding.UTF8.GetBytes(SendMesseage);
             udpClient.Send(sendbyte, sendbyte.Length, SendeIPEND);
             b = "0";
@@ -331,4 +431,66 @@ public class LEDSender : MonoBehaviour
     {
         b = "1";
     }*/
+
+    public void ColorChange(Color TargetColor, float ChangeTime)
+    {
+        if (!UntilChangeColor)
+        {
+            StartCoroutine(ColorChangeEmu(TargetColor, ChangeTime));
+        }
+    }
+
+    public void ColorChangeTest()
+    {
+        if (!UntilChangeColor)
+        {
+            StartCoroutine(ColorChangeEmu(Color.red, 2f));
+        }
+    }
+
+    IEnumerator ColorChangeEmu(Color TargetColor,float ChangeTime)
+    {
+        UntilChangeColor = true;
+        PrevColor = NowColor;
+        float TimeDis = 0;
+        Debug.Log("CallChange"+ TargetColor) ;
+        while (ChangeColorTime / ChangeTime <= 1.0f)
+        {
+            TimeDis = 0.02f;
+            ChangeColorTime += TimeDis;
+            //Debug.Log("Time delta: " + NowColor +  " " + ChangeColorTime.ToString());
+            NowColor = Color.Lerp(PrevColor, TargetColor, Mathf.Clamp01(ChangeColorTime/ChangeTime));
+            yield return new WaitForFixedUpdate();
+        }
+        ChangeColorTime = 0;
+        UntilChangeColor = false;
+        
+    }
+
+    IEnumerator Yuragi()
+    {
+        UntilChangeColor = true;
+        float TimePool = 0;
+        float ChangeRate = 0;
+        Color BaseColor = NowColor;
+        while(State != 14)
+        {
+
+            ChangeRate = (40 * Mathf.Cos(2 * Mathf.PI * TimePool / LoopTime) + 60)/100;
+            //Debug.Log(ChangeRate.ToString());
+            NowColor = new Color(BaseColor.r * ChangeRate, BaseColor.g * ChangeRate, BaseColor.b * ChangeRate);
+            TimePool += 0.02f;
+            yield return new WaitForFixedUpdate();
+        }
+        float EndTime = TimePool + BackColorTime;
+        while(TimePool <= EndTime)
+        {
+            ChangeRate = (40 * Mathf.Cos(2 * Mathf.PI * TimePool / LoopTime) + 60) / 100;
+            NowColor = new Color(BaseColor.r * ChangeRate, BaseColor.g * ChangeRate, BaseColor.b * ChangeRate);
+            TimePool += 0.02f;
+            yield return new WaitForFixedUpdate();
+        }
+        UntilChangeColor = false;
+        NowColor = Color.black;
+    }
 }

@@ -11,7 +11,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Tsunderadors.unity
     guid: 773c83f090a31a241aa129282aefe903
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/VirtualDrinkMenu.unity
     guid: ac485681095d8b4418b341e8ad7804eb
+  - enabled: 1
+    path: Assets/Scenes/VirtualDrinkMenuV2.unity
+    guid: 87a43c0efa335cc4d9dc6b51a91f5766
   m_configObjects: {}

@@ -8,72 +8,97 @@ public class main : MonoBehaviour
 {
     public int agentNum; //0:Kaguya, 1:Manaka
     public GameObject agents;//AgentObject
-    private GameObject agent; //Kaguya or Manaka
-    private Animator agentAnimator; //agent's animator
-    public TextMeshProUGUI dialogue, checkText;
-    public string mode;
+    public GameObject agent; //Kaguya or Manaka
+    public Animator[] agentAnimator; //agent's animator
+    public TextMeshProUGUI dialogue, checkState, checkMode, checkAgent, checkCheki;
+    public int mode; //0: Tsunderador, 1: Omakase soda
     public bool cheki;//false: チェキなし, true: チェキあり
-    public CameraShake shake;//カメラを揺らすためのもの
+    private CameraShake shake;//カメラを揺らすためのもの
     private AudioSource audioSource;//音声出力のために使用
     private AudioClip[] tsunVoices, dereVoices; //音声ファイル
     private string[] tsunTexts, dereTexts;//Dialogueファイル
     private ChangeDialogue changeDialogue;//change color and agent-name text in dialogue
     public string inputMessage;//音声入力SoundRecognizer_v2で出力されるメッセージ//state1 or state2
 
-    public Vector3 posWait, posStanby, posFirst;
-    public Vector3 rotWait, rotStanby, rotFirst;
-    private bool agentState; //agentの位置姿勢変更に使用（trueの時に変更、falseで無視）
+    private Vector3 posStanby, posGreeting, posBehaving;
+    private Vector3 rotStanby, rotGreeting, rotBehaving;
+    private bool posRotState, posRotState2; //agentの位置姿勢変更に使用（trueの時に変更、falseで無視）
+    private AutoBlinkVRM[] autoBlinkVRM;//表情を動かすためのクラス
+    private Fade panel;
+
+    public MessageSender messageSender;
+
+    public string CurrentState;
 
     void Start()
     {
         if (agents == null) agents = GameObject.Find("Agents");
+        agentAnimator = new Animator[agents.transform.childCount];
+        autoBlinkVRM = new AutoBlinkVRM[agents.transform.childCount];
+        for (int i=0; i < agents.transform.childCount; i++)
+        {
+            //アニメーターの登録
+            agentAnimator[i] = agents.transform.GetChild(i).gameObject.GetComponent<Animator>();
+
+            //モードの登録
+            if (mode == 0) agentAnimator[i].SetBool("tsundere", true);
+            else if (mode == 1) agentAnimator[i].SetBool("tsundere", false);
+            else Debug.Log("Error: please set mode 0 or 1.");
+
+            //チェキの登録
+            agentAnimator[i].SetBool("cheki", cheki);
+
+            //表情を動かすためのクラスを継承+表情のリセット
+            autoBlinkVRM[i] = agents.transform.GetChild(i).gameObject.GetComponent<AutoBlinkVRM>();
+        }
         if (changeDialogue == null) changeDialogue = gameObject.GetComponent<ChangeDialogue>();
         if (audioSource == null) audioSource = gameObject.GetComponent<AudioSource>();
         if (agentNum == 0)
         {
-            mode = "TSUNDERE";
             changeDialogue.SetDialogue(agentNum);//change color and agent-name text in dialogue
+            agent = agents.transform.GetChild(agentNum).gameObject;
         }
         else if (agentNum == 1)
         {
-            mode = "DEREDERE";
             changeDialogue.SetDialogue(agentNum);//change color and agent-name text in dialogue
+            agent = agents.transform.GetChild(agentNum).gameObject;
         }
-        agent = agents.transform.GetChild(agentNum).gameObject;
-        agent.transform.localPosition = posWait;
-        agent.transform.localRotation = Quaternion.Euler(rotWait);
-        agentAnimator = agent.GetComponent<Animator>();
-        agentAnimator.SetBool("mainBool", false);
-        agentAnimator.SetBool("cheki", cheki);
+        else
+        {
+            Debug.Log("Error: please set agentNum to 0-1.");
+        }
+
+
+        //エージェントの初期位置姿勢の設定
+        for(int i =0; i<2; i++)
+        {
+            agents.transform.GetChild(i).gameObject.transform.localPosition = GameObject.Find("Stanby").transform.GetChild(i).transform.localPosition;
+            agents.transform.GetChild(i).gameObject.transform.localRotation = GameObject.Find("Stanby").transform.GetChild(i).transform.localRotation;
+        }
+        posStanby = GameObject.Find("Stanby").transform.GetChild(agentNum).transform.localPosition;
+        rotStanby = GameObject.Find("Stanby").transform.GetChild(agentNum).transform.localRotation.eulerAngles;
+        posGreeting = GameObject.Find("Greeting").transform.GetChild(agentNum).transform.localPosition;
+        rotGreeting = GameObject.Find("Greeting").transform.GetChild(agentNum).transform.localRotation.eulerAngles;
+        posBehaving = GameObject.Find("Behaving").transform.GetChild(agentNum).transform.localPosition;
+        rotBehaving = GameObject.Find("Behaving").transform.GetChild(agentNum).transform.localRotation.eulerAngles;
+
 
         //Resourcesから音声ファイルの抽出
-        string folderName_TD = "TSUNDERE";//Voice/TSUNDERE内のファイルを取得
-        UnityEngine.Object[] audioClips_TD = Resources.LoadAll("Voices/" + folderName_TD, typeof(AudioClip));
-        string folderName_DD = "DEREDERE";//Voice/DEREDERE内のファイルを取得
-        UnityEngine.Object[] audioClips_DD = Resources.LoadAll("Voices/" + folderName_DD, typeof(AudioClip));
-        tsunVoices = new AudioClip[audioClips_TD.Length];//ファイルサイズの設定
-        dereVoices = new AudioClip[audioClips_DD.Length];//ファイルサイズの設定
-        for (int i = 0; i < audioClips_TD.Length; i++) this.tsunVoices[i] = Resources.Load("Voices/" + folderName_TD + "/" + audioClips_TD[i].name, typeof(AudioClip)) as AudioClip;
-        for (int i = 0; i < audioClips_DD.Length; i++) this.dereVoices[i] = Resources.Load("Voices/" + folderName_DD + "/" + audioClips_DD[i].name, typeof(AudioClip)) as AudioClip;
-        //TSUNDERE.txtデータの読み込み
-        TextAsset textassetTD = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
-        textassetTD = Resources.Load("Dialogues/TSUNDERE", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
-        int tsunSize = textassetTD.text.Split('\n').Length;
-        tsunTexts = new string[tsunSize];
-        string[] textMessageTD = textassetTD.text.Split('\n');
-        for (int i = 0; i < tsunSize; i++) tsunTexts[i] = textMessageTD[i].Replace(" ", "\n");//半角スペースを改行に変換
-                                                                                              //DEREDERE.txtデータの読み込み
-        TextAsset textassetDD = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
-        textassetDD = Resources.Load("Dialogues/DEREDERE", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
-        int dereSize = textassetDD.text.Split('\n').Length;
-        dereTexts = new string[dereSize];
-        string[] textMessageDD = textassetDD.text.Split('\n');
-        for (int i = 0; i < dereSize; i++) dereTexts[i] = textMessageDD[i].Replace(" ", "\n");//半角スペースを改行に変換
+        SetAgentVoice(agentNum);
+        SetDialogue(agentNum);
 
-        if (dialogue == null) dialogue = GameObject.Find("Canvas/Dialogue").gameObject.GetComponent<TextMeshProUGUI>();
-        if (shake == null) shake = Camera.main.GetComponent<CameraShake>();
+
+        if (dialogue == null) dialogue = GameObject.Find("Canvas/Dialogue").gameObject.GetComponent<TextMeshProUGUI>();//メッセージボックスのテキスト情報を変更するためのクラスを継承
+        if (checkState == null) checkState = GameObject.Find("Canvas/State").gameObject.GetComponent<TextMeshProUGUI>();
+        if (checkMode == null) checkMode = GameObject.Find("Canvas/Mode").gameObject.GetComponent<TextMeshProUGUI>();
+        if (checkAgent == null) checkAgent = GameObject.Find("Canvas/Agent").gameObject.GetComponent<TextMeshProUGUI>();
+        if (checkCheki == null) checkCheki = GameObject.Find("Canvas/Cheki").gameObject.GetComponent<TextMeshProUGUI>();
+        if (shake == null) shake = Camera.main.GetComponent<CameraShake>();//カメラを揺らすためのクラスを継承
 
         inputMessage = "";
+        
+
+        if (panel == null) panel = GameObject.Find("Canvas/Panel").gameObject.GetComponent<Fade>();
     }
 
     
@@ -82,114 +107,286 @@ public class main : MonoBehaviour
     void Update()
     {
         //Debug.Log("agentPos: " + agent.transform.localPosition + ", agentRot: " + agent.transform.localRotation.eulerAngles);
-        if (Input.GetKey(KeyCode.N) && agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Wait"))//キャラクターの振る舞いスタート：N
+        if (Input.GetKey(KeyCode.N) && agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("00_Stanby"))//キャラクターの振る舞いスタート：N
         {
-            agentAnimator.SetBool("mainBool",true);
+            pythonProgram py = this.GetComponent<pythonProgram>();
+            py.ChangeBehaviourBasedOnQuestionnaire();
+            inputMessage = "";
+            
         }
-        if (Input.GetKey(KeyCode.A) && agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Wait"))//アンケートからメニュー選定：A
+        if (Input.GetKey(KeyCode.A) && agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("00_Stanby"))//アンケートからメニュー選定：A
         {
             pythonProgram py = this.GetComponent<pythonProgram>();
             py.ChangeBehaviourBasedOnQuestionnaire();
         }
-        if (Input.GetKeyDown(KeyCode.I) && agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Wait"))//手動でメニュー切り替え：I
+        if (Input.GetKeyDown(KeyCode.I) && agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("00_Stanby"))//手動でメニュー切り替え：I
         {
-            if (agentNum == 0) agentNum = 1;
-            else agentNum = 0;
+            if (mode==0)
+            {
+                mode = 1;// change to Omakase soda
+                agentAnimator[agentNum].SetBool("tsundere", false);
+            }
+            else
+            {
+                mode = 0;//change to Tsunderador
+                agentAnimator[agentNum].SetBool("tsundere", true);
+            }
             SetAgent(agentNum);
         }
         if (Input.GetKey(KeyCode.S))//カメラを揺らす：S
         {
             StartCoroutine(ShakeCamera());
         }
-        if(agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("WaitAnswer") && inputMessage == "state2")//ユーザからの音声入力があったとき
+
+        //Parameter: responseの処理
+        if(agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("06_WaitingForResponseTD")|| agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("06_WaitingForResponseOM"))
         {
-            agentAnimator.SetBool("mainBool", true);
-        }
-        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("WaitAnswer") && Input.GetKey(KeyCode.T))//手動でユーザからの音声入力を設定：T
-        {
-            agentAnimator.SetBool("mainBool", true);
-            Debug.Log("Ket T is clecked.");
+            if(inputMessage == "answer")//ユーザからの音声入力があったとき
+            {
+                //agent.transform.localPosition = posBehaving;
+                //agent.transform.localRotation = Quaternion.Euler(rotBehaving);
+                agentAnimator[agentNum].SetBool("response", true);
+                Debug.Log("response: true");
+            }
+            if (Input.GetKey(KeyCode.T))//手動でユーザからの音声入力を設定：T
+            {
+                //agent.transform.localPosition = posBehaving;
+                //agent.transform.localRotation = Quaternion.Euler(rotBehaving);
+                agentAnimator[agentNum].SetBool("response", true);
+                Debug.Log("Ket T is clecked.");
+            }
+           
+
         }
        
 
 
         //エージェントの位置姿勢設定
-        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Wait") && agentState)//State: Wait開始時にの位置姿勢変更
+        if (agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("00_Stanby") && posRotState)//State: Stanby開始時にの位置姿勢変更
         {
-            agent.transform.localPosition = posWait;
-            agent.transform.localRotation = Quaternion.Euler(rotWait);
-            agentState = false;
+            ////agent.transform.localPosition = posStanby;
+            ////agent.transform.localRotation = Quaternion.Euler(rotStanby);
+            posRotState = false;
         }
-        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Stanby") && agentState)//State: Stanby開始時にの位置姿勢変更
+        
+        else if (agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("04_Greeting1") && posRotState)//State: 04_Greeting1開始時にの位置姿勢変更
         {
-            agent.transform.localPosition = posStanby;
-            agent.transform.localRotation = Quaternion.Euler(rotStanby);
-            agentState = false;
+            //agent.transform.localPosition = posGreeting;
+            //agent.transform.localRotation = Quaternion.Euler(rotGreeting);
+            //Debug.Log("Greeting AgentPos: " + agent.transform.position);
+            posRotState = false;
         }
-        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("First") && agentState)//State: First開始時にの位置姿勢変更
+        else if (agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("05_Tsunderador1") && posRotState)//State: 05_Tsunderador1開始時にの位置姿勢変更
         {
-            agent.transform.localPosition = posFirst;
-            agent.transform.localRotation = Quaternion.Euler(rotFirst);
-            agentState = false;
+            agent.transform.localPosition = posBehaving;
+            agent.transform.localRotation = Quaternion.Euler(rotBehaving);
+            posRotState = false;
         }
+        else if (agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("05_Omakase1") && posRotState)//State: 05_Omakase1開始時にの位置姿勢変更
+        {
+            agent.transform.localPosition = posBehaving;
+            agent.transform.localRotation = Quaternion.Euler(rotBehaving);
+            posRotState = false;
+        }
+        else if (agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("03_MoveFrameIn1"))//State: 03_MoveFrameIn1開始時にの位置姿勢変更
+        {
+            if (posRotState2)
+            {
+                agent.transform.localPosition = posGreeting;
+                agent.transform.localRotation = Quaternion.Euler(rotGreeting);
+                agentAnimator[agentNum].SetBool("walking", false);
+                posRotState2 = false;
+            }
+
+        }
+        else if (agentAnimator[agentNum].GetCurrentAnimatorStateInfo(0).IsName("02_MoveFrameOut1"))//State: 02_MoveFrameOut1開始時にの位置姿勢変更
+        {
+            if (agentNum == 0)
+            {
+                if (agent.transform.localPosition.x < -4.5f) agentAnimator[agentNum].SetBool("walking", false);
+                else WalkingToLeft();
+            }
+            else
+            {
+                if (agent.transform.localPosition.x < -5.5f)agentAnimator[agentNum].SetBool("walking", false);
+                else WalkingToLeft();
+            }
+            
+        }
+        
 
     }
+
+    public void SetAgentVoice(int agentNUM)
+    {
+        string agentName = "";
+        if (agentNUM == 0)
+        {
+            agentName = "Kaguya";
+        }else if (agentNUM == 1)
+        {
+            agentName = "Manaka";
+        }
+        //Resourcesから音声ファイルの抽出
+        string folderName_TD = "TSUNDERE";//Voice/TSUNDERE内のファイルを取得
+        UnityEngine.Object[] audioClips_TD = Resources.LoadAll("Voices/" + agentName + "/" + folderName_TD, typeof(AudioClip));
+        string folderName_DD = "DEREDERE";//Voice/DEREDERE内のファイルを取得
+        UnityEngine.Object[] audioClips_DD = Resources.LoadAll("Voices/" + agentName + "/" + folderName_DD, typeof(AudioClip));
+        tsunVoices = new AudioClip[audioClips_TD.Length];//ファイルサイズの設定
+        dereVoices = new AudioClip[audioClips_DD.Length];//ファイルサイズの設定
+        for (int i = 0; i < audioClips_TD.Length; i++) this.tsunVoices[i] = Resources.Load("Voices/" + agentName + "/" + folderName_TD + "/" + audioClips_TD[i].name, typeof(AudioClip)) as AudioClip;
+        for (int i = 0; i < audioClips_DD.Length; i++) this.dereVoices[i] = Resources.Load("Voices/" + agentName + "/" + folderName_DD + "/" + audioClips_DD[i].name, typeof(AudioClip)) as AudioClip;
+    }
+
+    public void SetDialogue(int agentNUM)
+    {
+        //TSUNDERE.txtデータの読み込み
+        TextAsset textassetTD = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
+        TextAsset textassetDD = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
+        if (agentNUM == 0)
+        {
+            textassetTD = Resources.Load("Dialogues/Kaguya/TSUNDERE", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+            textassetDD = Resources.Load("Dialogues/Kaguya/DEREDERE", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        }
+        else
+        {
+            textassetTD = Resources.Load("Dialogues/Manaka/TSUNDERE", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+            textassetDD = Resources.Load("Dialogues/Manaka/DEREDERE", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        }
+       
+        int tsunSize = textassetTD.text.Split('\n').Length;
+        tsunTexts = new string[tsunSize];
+        string[] textMessageTD = textassetTD.text.Split('\n');
+        for (int i = 0; i < tsunSize; i++) tsunTexts[i] = textMessageTD[i].Replace(" ", "\n");//半角スペースを改行に変換
+                                                                                              //DEREDERE.txtデータの読み込み
+        
+        int dereSize = textassetDD.text.Split('\n').Length;
+        dereTexts = new string[dereSize];
+        string[] textMessageDD = textassetDD.text.Split('\n');
+        for (int i = 0; i < dereSize; i++) dereTexts[i] = textMessageDD[i].Replace(" ", "\n");//半角スペースを改行に変換
+    } 
 
     //Animation Stateが遷移したときに実行される関数（なぜかこの関数の中ではagentの位置姿勢の変更ができない。。。代わりにupdate関数内で変更）
     public void SetAnimationState(string animationState)
     {
         switch (animationState)
         {
-            case "Wait":
-                agentState = true;
-                agentAnimator.SetBool("mainBool", false);
+            case "00_Stanby":
+                //各パラメータの初期化
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("start", false);
+                agentAnimator[agentNum].SetBool("response", false);
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                agentAnimator[agentNum].SetBool("walking", true);
+                panel.FadeIn();
+                agent.transform.localPosition = posStanby;
+                agent.transform.localRotation = Quaternion.Euler(rotStanby);
+                autoBlinkVRM[agentNum].FaceReset();
                 dialogue.text = "スタンバイ中...";
-                Debug.Log("State: Wait");
+                checkState.text = "State: 00_Stanby";
+                Debug.Log("State: 00_Stanby");
                 break;
-            case "Move":
-                agentAnimator.SetBool("mainBool", false);
-                Debug.Log("State: Move");
+            case "02_MoveFrameOut1":
+                agentAnimator[agentNum].SetBool("start", false);
+                agentAnimator[agentNum].SetBool("walking", true);
+                autoBlinkVRM[agentNum].Smile();
+                checkState.text = "State: 02_MoveFrameOut1";
+               Debug.Log(checkState.text);
                 break;
-            case "Stanby":
-                agentState = true;
-                agentAnimator.SetBool("mainBool", false);
-                Debug.Log("State: Stanby");
-                playAudio(0);
+            case "03_MoveFrameIn1":
+                posRotState2 = true;
+                checkState.text = "State: 03_MoveFrameIn1";
+                autoBlinkVRM[agentNum].Smile();
+                Debug.Log(checkState.text);
+                //panel.FadeOut();
+                panel.FadeIn();
                 break;
-            case "First":
-                agentState = true;
-                agentAnimator.SetBool("mainBool", false);
-                Debug.Log("State: First");
-                StartCoroutine(ContinuousPlay(1));
+            case "04_Greeting1":
+                posRotState = true;
+                if (mode == 0) agentAnimator[agentNum].SetBool("tsundere", true);
+                else agentAnimator[agentNum].SetBool("tsundere", false);
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                checkState.text = "State: 04_Greeting1";
+                Debug.Log(checkState.text);
+                StartCoroutine(playAudio(0));
                 break;
-            case "WaitAnswer":
-                agentAnimator.SetBool("mainBool", false);
-                Debug.Log("State: WaitAnswer");
-                agentAnimator.SetBool("cheki", cheki);//チェキの設定（チェキを撮るかどうか）
+            case "05_Tsunderador1":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Angry();
+                checkState.text = "State: 05_Tsunderador1";
+                Debug.Log(checkState.text);
+                StartCoroutine(ContinuousPlay(1,3));
                 break;
-            case "Second":
-                agentAnimator.SetBool("mainBool", false);
-                StartCoroutine(ContinuousPlay(3));
-                Debug.Log("State: Second");
+            case "05_Omakase1":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                checkState.text = "State: 05_Omakase1";
+                Debug.Log(checkState.text);
+                StartCoroutine(ContinuousPlay(1,2));
                 break;
-            case "Bye":
-                agentAnimator.SetBool("mainBool", false);
-                playAudio(6);
-                Debug.Log("State: Bye");
+            case "06_WaitingForResponseTD":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Angry();
+                checkState.text = "State: 06_WaitingForResponseTD";
+                Debug.Log(checkState.text);
                 break;
-            case "ByeCheki":
-                agentAnimator.SetBool("mainBool", false);
-                Debug.Log("State: ByeCheki");
-                playAudio(5);
+            case "06_WaitingForResponseOM":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                checkState.text = "State: 06_WaitingForResponseOM";
+                Debug.Log(checkState.text);
                 break;
-            case "Back":
-                agentAnimator.SetBool("mainBool", false);
-                Debug.Log("State: Back");
-                dialogue.text = "スタンバイ中...";
+            case "07_Tsunderador2":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                StartCoroutine(ContinuousPlay(4,2));
+                checkState.text = "State: 07_Tsunderador2";
+                Debug.Log(checkState.text);
+                break;
+            case "07_Omakase2":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                StartCoroutine(ContinuousPlay(3,4));
+                checkState.text = "State: 07_Omakase2";
+                Debug.Log(checkState.text);
+                break;
+            case "idleAfterTD":
+                autoBlinkVRM[agentNum].Smile();
+                checkState.text = "State: idleAfterTD";
+                Debug.Log(checkState.text);
+                break;
+            case "08_Greeting2":
+                posRotState = true;
+                if (cheki) agentAnimator[agentNum].SetBool("cheki", true);
+                else agentAnimator[agentNum].SetBool("cheki", false);
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                if (mode==0) StartCoroutine(playAudio(6));
+                else StartCoroutine(playAudio(7));
+                checkState.text = "State: 08_Greeting2";
+               Debug.Log(checkState.text);
+                break;
+            case "09_Greeting2CCOCheki":
+                posRotState = true;
+                agentAnimator[agentNum].SetBool("waitingSound", false);
+                autoBlinkVRM[agentNum].Smile();
+                checkState.text = "State: 09_Greeting2CCOCheki";
+                Debug.Log(checkState.text);
+                if (mode == 0) StartCoroutine(playAudio(7));
+                else StartCoroutine(playAudio(8));
+                StartCoroutine(PlayCCOcheki());
                 break;
             default:
                 break;
         }
+        CurrentState = animationState;
     }
     //エージェントを設定する関数（現状（3/15）：エージェントの種類＝ツンデレorデレデレ）
     public void SetAgent(int agentNUM)
@@ -198,22 +395,37 @@ public class main : MonoBehaviour
         switch (agentNum)
         {
             case 0://Kaguya
-                mode = "TSUNDERE";
                 changeDialogue.SetDialogue(agentNum);//change color and agent-name text in dialogue
+                Debug.Log("Change to Kaguya.");
                 break;
             case 1://Manaka
-                mode = "DEREDERE";
                 changeDialogue.SetDialogue(agentNum);//change color and agent-name text in dialogue
+                Debug.Log("Change to Manaka.");
                 break;
             default:
                 break;
         }
         if (agents == null) agents = GameObject.Find("Agents");
         agent = agents.transform.GetChild(agentNum).gameObject;
-        agentAnimator = agent.GetComponent<Animator>();
-
+        autoBlinkVRM[agentNum].FaceReset();
+        //エージェントの位置姿勢設定
+        posStanby = GameObject.Find("Stanby").transform.GetChild(agentNum).transform.localPosition;
+        rotStanby = GameObject.Find("Stanby").transform.GetChild(agentNum).transform.localRotation.eulerAngles;
+        posGreeting = GameObject.Find("Greeting").transform.GetChild(agentNum).transform.localPosition;
+        rotGreeting = GameObject.Find("Greeting").transform.GetChild(agentNum).transform.localRotation.eulerAngles;
+        posBehaving = GameObject.Find("Behaving").transform.GetChild(agentNum).transform.localPosition;
+        rotBehaving = GameObject.Find("Behaving").transform.GetChild(agentNum).transform.localRotation.eulerAngles;
+        //animation
+        agentAnimator[agentNum].SetBool("response", false);
+        agentAnimator[agentNum].SetBool("waitingSound", false);
+        agentAnimator[agentNum].SetBool("walking", true);
+        agentAnimator[agentNum].SetBool("start", true);
     }
 
+    public void Daipan()
+    {
+        StartCoroutine(ShakeCamera());
+    }
     //カメラを揺らす関数
     IEnumerator ShakeCamera()
     {
@@ -225,16 +437,17 @@ public class main : MonoBehaviour
     }
 
     //１つのテキスト表示と音声出力させる関数
-    private void playAudio(int audioClipNum)
+    IEnumerator playAudio(int audioClipNum)
     {
+        yield return new WaitForSecondsRealtime(0.5f);
         switch (mode)
         {
-            case "TSUNDERE":
+            case 0:
                 audioSource.clip = tsunVoices[audioClipNum];
                 audioSource.Play();
                 dialogue.text = tsunTexts[audioClipNum];
                 break;
-            case "DEREDERE":
+            case 1:
                 audioSource.clip = dereVoices[audioClipNum];
                 audioSource.Play();
                 dialogue.text = dereTexts[audioClipNum];
@@ -242,47 +455,61 @@ public class main : MonoBehaviour
             default:
                 break;
         }
+        yield return new WaitForSecondsRealtime(audioSource.clip.length+0.3f);//音声ファイルが再生されている時間待機
+        agentAnimator[agentNum].SetBool("waitingSound", true);
     }
     //２つの連続したテキスト表示と音声出力させる関数
-    IEnumerator ContinuousPlay(int audioClipNum)
+    IEnumerator ContinuousPlay(int audioClipNum, int size)
     {
+        yield return new WaitForSecondsRealtime(0.3f);
         switch (mode)
         {
-            case "TSUNDERE":
-                audioSource.clip = tsunVoices[audioClipNum];
-                audioSource.Play();
-                dialogue.text = tsunTexts[audioClipNum];
+            case 0:
+                for (int i = audioClipNum; i < audioClipNum + size; i++)
+                {
+                    audioSource.clip = tsunVoices[i];
+                    audioSource.Play();
+                    dialogue.text = tsunTexts[i];
+                    yield return new WaitForSecondsRealtime(audioSource.clip.length);//音声ファイルが再生されている時間待機
+                }
+                agentAnimator[agentNum].SetBool("waitingSound", true);
                 break;
-            case "DEREDERE":
-                audioSource.clip = dereVoices[audioClipNum];
-                audioSource.Play();
-                dialogue.text = dereTexts[audioClipNum];
+            case 1:
+                for (int i = audioClipNum; i < audioClipNum + size; i++)
+                {
+                    audioSource.clip = dereVoices[i];
+                    audioSource.Play();
+                    dialogue.text = dereTexts[i];
+                    yield return new WaitForSecondsRealtime(audioSource.clip.length);//音声ファイルが再生されている時間待機
+                }
+                agentAnimator[agentNum].SetBool("waitingSound", true);
                 break;
             default:
                 break;
         }
-        yield return new WaitForSecondsRealtime(audioSource.clip.length);//音声ファイルが再生されている時間待機
-        switch (mode)
+       
+    }
+    IEnumerator PlayCCOcheki()
+    {
+        yield return new WaitForSecondsRealtime(15f);
+        messageSender.SendChekiStatus();
+    }
+
+    public void WalkingToLeft()
+    {
+        if (agentNum == 0)
         {
-            case "TSUNDERE":
-                audioSource.clip = tsunVoices[audioClipNum+1];
-                audioSource.Play();
-                dialogue.text = tsunTexts[audioClipNum+1];
-                break;
-            case "DEREDERE":
-                audioSource.clip = dereVoices[audioClipNum+1];
-                audioSource.Play();
-                dialogue.text = dereTexts[audioClipNum+1];
-                break;
-            default:
-                break;
+            agent.transform.Translate(0, 0, 0.006f);
         }
-        yield return new WaitForSecondsRealtime(audioSource.clip.length);//音声ファイルが再生されている時間待機
-        agentAnimator.SetBool("mainBool", true);
-        if (agentAnimator.GetCurrentAnimatorStateInfo(0).IsName("Second"))//ひとつ前でmainBoolをtrue->falseに変化しなかったので、triggerを代用
+        else if (agentNum == 1)
         {
-            agentAnimator.SetTrigger("ChekiTrigger");
+            agent.transform.Translate(0, 0, 0.006f);
         }
+        
+    }
+    public void WalkingFromLeft()
+    {
+        agent.transform.Translate(0, 0, 0.006f);
     }
 }
 
